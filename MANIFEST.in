@@ -1,0 +1,9 @@
+# Include the license file
+include LICENSE.txt
+
+# Include version file
+include version.py
+
+# Exclude temporary files and directories
+recursive-exclude nbpymd __pycache__
+recursive-exclude nbpymd *.py[co]
