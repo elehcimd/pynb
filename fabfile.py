@@ -85,7 +85,7 @@ def test_pip(cleancontainer=True):
     if cleancontainer:
         docker_stop()
         # sometimes, Docker returns too early and then docker_start fails.
-        time.sleep(0.5)
+        time.sleep(1)
         docker_start(develop=False)
     # WE have now a fresh container as defined in Dockerfile
 
