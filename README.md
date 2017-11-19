@@ -58,7 +58,7 @@ The parameter names of the `cells` function are mapped to command line arguments
 
 Lines whose content is either `'''` or `''''''` have a special meaning: Markdown cells are delimited by `'''` and `''''''` serves as separator between Python cells. Markdown cell delimiters serve also as separators between Python and Markdown cells. An empty Markdown cell `'''\n'''` is equivalent to `''''''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away.
 
-In presence of parameters, if the first cell is a Markdown cell, it is treated as the title and the injected Python cell with parameters is inserted as second cell.
+In presence of parameters, if the first cell is a Markdown cell, it is treated as the title and the injected Python cell with parameters is inserted as the second cell.
 
 ### Using the `nbapp` command line tool
 
@@ -68,7 +68,7 @@ To run the notebook defined in ``sum.py`:
 nbapp sum.py --param a=3 --param b=5
 ```
 
-Parameters are passed from command line with `--param` options, whose value is formatted as `name:value`.
+Parameters are passed from the command line with `--param` options, whose value is formatted as `name:value`.
 Parameter values are strings and might require casting to their proper type (E.g., int) in the notebook.
 
 Parameters `a` and `b` are injected in the notebook at execution time as an additional Python cell.
@@ -80,7 +80,7 @@ Options `--export-html` and `--export-ipynb` let you export to .html and .ipynb 
 
 #### Caching
 
-The caching system allows you to reuse transparently the Python sessions and outputs of previous notebook executions. Each cell is associated to an hash generated from these fields:
+The caching system allows you to reuse transparently the Python sessions and outputs of previous notebook executions. Each cell is associated to a hash generated from these fields:
 
 * **uid**: Unique identifier of the notebook. It is either the notebook module name or the class name. An additional id can be appended with the command line parameter `--append-id`.
 
@@ -90,7 +90,7 @@ The caching system allows you to reuse transparently the Python sessions and out
 
 * **index**: Cell position
 
-Cache hits speed up significantly the notebook execution. Cache misses cause the invalidation of the cache. The cache is maintained in temporary files. To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
+Cache hits speed up significantly the notebook execution. Cache misses result in the invalidation of the cache. The cache is maintained in temporary files. To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
 
 ### Using the library interface
 
@@ -135,7 +135,7 @@ Method `Notebook.run` takes care of executing the notebook taking into account t
 
 There must be an exact match between the parameter names of the `cells` function and the attribute names of the object returned by [ArgumentParser.parse_args].
 
-All notebook parameter values that have no default value must be provided from command line. E.g., parameter `b` in the example above.
+All notebook parameter values that have no default value must be provided from the command line. E.g., parameter `b` in the example above.
 
 
 ## License
