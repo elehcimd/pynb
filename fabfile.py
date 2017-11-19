@@ -152,7 +152,7 @@ def release():
     from secrets import pypi_auth
 
     inc_version()
-#    test()
+    test()
     build()
 
     pathname = 'dist/nbpymd-{}.tar.gz'.format(version.__version__)
