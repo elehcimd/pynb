@@ -432,7 +432,7 @@ class Notebook:
 
         self.parser.add_argument('--param', action='append', help='Cells param. Format: name=value')
 
-        self.parser.add_argument('--id', default='', help='Notebook unique id')
+        self.parser.add_argument('--append-id', default='', help='Notebook unique id')
 
         self.add_argument('--export-html', help='Pathname to export to HTML format')
         self.add_argument('--export-ipynb', help='Pathname to export to Jupyter notebook format')
@@ -482,8 +482,8 @@ class Notebook:
             logging.info('Running notebook {}'.format(self.__class__.__name__))
             uid = self.__class__.__name__
 
-        if args.id:
-            uid += ':' + args.id
+        if args.append_id:
+            uid += ':' + args.append_id
 
         logging.info("Unique id: '{}'".format(uid))
         logging.info('Disable cache: {}'.format(args.disable_cache))
