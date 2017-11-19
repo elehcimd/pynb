@@ -1,3 +1,8 @@
+"""
+Examples of cells for notebook definition.
+"""
+
+
 def cells():
     int(10000 + 2345)
 

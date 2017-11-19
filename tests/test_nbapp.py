@@ -17,6 +17,12 @@ def sum(a, b):
     int(a + b)
 
 
+def markdown():
+    '''
+    # Title
+    '''
+
+
 def test_nbapp_cells():
     cmd = 'nbapp {} --disable-cache --export-ipynb -'
     output = local(cmd.format(os.path.realpath(__file__)), capture=True)
@@ -42,3 +48,9 @@ def test_nbapp_export_ipynb(tmpdir):
     cmd = 'jupyter nbconvert --stdout --to notebook {}/test.ipynb'
     output = local(cmd.format(tmpdir), capture=True)
     assert '12345' in output
+
+
+def test_nbapp_export_html(tmpdir):
+    cmd = 'nbapp {}:markdown --disable-cache --export-html -'
+    output = local(cmd.format(os.path.realpath(__file__)), capture=True)
+    assert '>Title<' in output

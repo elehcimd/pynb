@@ -167,4 +167,4 @@ def clean():
     """
     Rempove temporary files
     """
-    docker_exec('rm -rf .cache .eggs build dist *egg-info')
+    docker_exec('rm -rf .cache .eggs build dist')

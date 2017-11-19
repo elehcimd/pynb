@@ -362,7 +362,7 @@ class Notebook:
         (body, resources) = html_exporter.from_notebook_node(self.nb)
 
         if pathname == '-':
-            nbf.write(self.nb, sys.__stdout__)
+            sys.__stdout__.write(body)
         else:
             with open(pathname, 'w') as f:
                 f.write(body)
@@ -391,8 +391,10 @@ class Notebook:
             pathname = cells_location
             func_name = 'cells'
 
-        self.cells = get_func(func_name, pathname)
-        # fatal("Function '{}' not found in '{}' or synthax issues".format(func_name, pathname))
+        try:
+            self.cells = get_func(func_name, pathname)
+        except:
+            fatal("Function '{}' not found in '{}' or synthax issues".format(func_name, pathname))
 
     def run(self, params=[]):
         """
