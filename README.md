@@ -169,7 +169,7 @@ Any changes to the package dependencies in `setup.py` must be reflected in `requ
 
 The Jupyter server is reachable at [http://127.0.0.1:8889/tree].
 
-### Releasing
+### Uploading a new release
 
 Create a file `secrets.py` in the project directory with the Pypi credentials in this format:
 
@@ -189,7 +189,7 @@ fab release
 
 ### Tests
 
-To run the module tests:
+To run the py.test tests:
 
 ```
 fab test
