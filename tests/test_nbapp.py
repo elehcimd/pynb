@@ -53,4 +53,5 @@ def test_nbapp_export_ipynb(tmpdir):
 def test_nbapp_export_html(tmpdir):
     cmd = 'nbapp {}:markdown --disable-cache --export-html -'
     output = local(cmd.format(os.path.realpath(__file__)), capture=True)
+    assert '<html>' in output
     assert '>Title<' in output
