@@ -72,6 +72,8 @@ def test_execute():
         'this-is-13': '^13$'
     }
 
+    assert len(result['cells']) == 7
+
     for k, v in test_matches.items():
         found = False
 

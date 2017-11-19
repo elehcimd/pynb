@@ -2,11 +2,33 @@
 
 ## Installation
 
+The package is compatible with Python >= 3.4.
+
 To install nbpymd on your system:
 
 ```
 pip install nbpymd
 ```
+
+## Usage
+
+### nbapp
+
+### Subclassing the `Notebook` class
+
+```
+nbapp mynb.py --export-html test.html --export-ipynb mynb.ipynb
+``
+
+To remove the cache:
+
+```
+rm /tmp/nbpymd-cache-*
+```
+
+On MacOS, ignore twarning messages `[...] jupyter_client/connect.py:157: RuntimeWarning: Failed to set sticky bit on [...]`. It's a known annoying (bug)[https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710].
+
+### Caching
 
 ## License
 
@@ -25,6 +47,14 @@ Please install Docker and Fabric in your system. To install Fabric:
 pip install Fabric3
 ```
 
+### Dependencies
+
+For ease of development, the file `requirements.txt` includes the package dependencies.
+Any changes to the package dependencies in `setup.py` must be reflected in `requirements.txt`.
+
+### Jupyter server
+
+The Jupyter server is reachable at [http://127.0.0.1:8889/tree].
 
 ### Releasing
 
@@ -56,6 +86,12 @@ To run the module tests:
 fab test
 ```
 
+To run single test:
+
+```
+fab test:tests/test_nbapp.py::test_nbapp_cells
+```
+
 To run tests printing output and stopping at first error:
 
 ```
@@ -79,6 +115,7 @@ To test the pip package:
 fab test_pip
 ```
 
+This end-to-end test must be executed after every release.
 
 ### Docker container
 

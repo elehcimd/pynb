@@ -6,11 +6,15 @@ import logging
 import os
 import sys
 import time
+import warnings
 
 import dill
 import nbformat as nbf
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
+
+from nbpymd.utils import get_func, fatal
+from nbpymd.version import __version__
 
 logging.basicConfig(level=logging.INFO)
 
@@ -27,7 +31,7 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         self.prev_fname_session = None
         self.prev_fname_session_loaded = None
         self.disable_cache = False
-        self.clear_cache = False
+        self.ignore_cache = False
         self.kwargs = {}
         self.nb_name = None
 
@@ -42,7 +46,7 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
                                                    kwargs=self.kwargs,
                                                    cell=str(cell.source),
                                                    index=cell_index).encode('utf-8')
-        hash = hashlib.sha1(s).hexdigest()[:12]
+        hash = hashlib.sha1(s).hexdigest()[:8]
         return hash
 
     def run_cell(self, cell, cell_index=0):
@@ -62,7 +66,7 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
             logging.info('Cell {}: Running: "{}"'.format(hash, cell_snippet))
             return super().run_cell(cell, cell_index)
 
-        if not self.clear_cache:
+        if not self.ignore_cache:
             if self.cache_valid and os.path.isfile(fname_session) and os.path.isfile(fname_value):
                 logging.info('Cell {}: Loading: "{}"'.format(hash, cell_snippet))
                 self.prev_fname_session = fname_session
@@ -94,8 +98,6 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         # We make sure that injected cells do not interfere with the cell index...
         # value[0]['content']['execution_count'] = cell_index
 
-        logging.info('Cell {}: Caching: "{}"'.format(hash, cell_snippet))
-
         # 3) Cache cell session
         cached = self.session_dump(hash, fname_session)
 
@@ -105,7 +107,7 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
             self.prev_fname_session_loaded = fname_session
             self.prev_fname_session = fname_session
 
-            logging.info('Cell {}: dumping value to {}'.format(hash, fname_value))
+            logging.debug('Cell {}: dumping value to {}'.format(hash, fname_value))
 
             with open(fname_value, 'wb') as f:
                 dill.dump(value, f)
@@ -179,19 +181,11 @@ class Notebook:
         Initialize notebook.
         """
 
-        self.parser = argparse.ArgumentParser()
+        self.parser = argparse.ArgumentParser(
+            description='nbapp v{} running on Python v{}.{}.{}'.format(__version__, *sys.version_info[:3]))
         self.nb = nbf.v4.new_notebook()
         self.nb['cells'] = []
         self.first_markdown = True
-
-    def cells(self, **kwargs):
-        """
-        Notebooks must extend this method with cells content
-        :param kwargs: parameters passed cells execution
-        :return:
-        """
-
-        raise Exception('Not implemented')
 
     def add(self, func, **kwargs):
         """
@@ -203,6 +197,16 @@ class Notebook:
 
         if len(kwargs) > 0:
             self.add_cell_params(kwargs)
+
+        params = set(kwargs.keys())
+        func_params = set(inspect.getargspec(func).args)
+
+        # ignore self, which is present when extending Notebook.
+        if 'self' in func_params:
+            func_params.remove('self')
+
+        if params != func_params:
+            fatal('Params {} not matching cells function params {}'.format(list(params), list(func_params)))
 
         lines = inspect.getsourcelines(func)[0][1:]
 
@@ -224,11 +228,10 @@ class Notebook:
                 line = line[indent_count:]
 
             if line.strip() == "'''":  # if md block begin or end..
-                if not inside_markdown:  # if md block begin: new markdown block! flush buffer
-                    if len(buffer.strip()) > 0:  # add code cell only if not empty after stripping it
+                if len(buffer.strip()) > 0:
+                    if not inside_markdown:  # if md block begin: new markdown block! flush buffer
                         self.add_cell_code(buffer)
-                else:  # if md block end: markdown block completed! flush buffer
-                    if len(buffer) > 0:
+                    else:  # if md block end: markdown block completed! flush buffer
                         self.add_cell_markdown(buffer)
                 buffer = ""
                 inside_markdown = not inside_markdown
@@ -236,7 +239,10 @@ class Notebook:
                 buffer += line
 
         if len(buffer.strip()) > 0:
-            self.add_cell_code(buffer)
+            if not inside_markdown:
+                self.add_cell_code(buffer)
+            else:
+                self.add_cell_markdown(buffer)
 
     def add_cell_params(self, params):
         """
@@ -296,7 +302,7 @@ class Notebook:
         cell = nbf.v4.new_code_cell(cell_str)
         self.nb['cells'].append(cell)
 
-    def execute(self, kwargs={}, disable_cache=False, clear_cache=False):
+    def execute(self, kwargs={}, disable_cache=False, ignore_cache=False):
         """
         Execute notebook
         :return: self
@@ -309,12 +315,17 @@ class Notebook:
 
         ep = CachedExecutePreprocessor(timeout=None, kernel_name='python3')
         ep.disable_cache = disable_cache
-        ep.clear_cache = clear_cache
+        ep.ignore_cache = ignore_cache
         ep.kwargs = kwargs
         ep.nb_name = self.__class__.__name__
 
         # Execute the notebook
-        ep.preprocess(self.nb, {'metadata': {'path': '.'}})
+
+        with warnings.catch_warnings():
+            # On MacOS, annoying warning "RuntimeWarning: Failed to set sticky bit on"
+            # Let's suppress it.
+            warnings.simplefilter("ignore")
+            ep.preprocess(self.nb, {'metadata': {'path': '.'}})
 
         self.exec_time = time.perf_counter() - self.exec_begin
 
@@ -330,12 +341,16 @@ class Notebook:
         :param pathname: output filename
         :return:
         """
-        with open(pathname, 'w+') as f:
-            nbf.write(self.nb, f)
 
-        logging.info('Notebook exported to {}'.format(pathname))
+        if pathname == '-':
+            nbf.write(self.nb, sys.__stdout__)
+        else:
+            with open(pathname, 'w') as f:
+                nbf.write(self.nb, f)
 
-    def export_html(self, pathname=None):
+        logging.info("Jupyter notebook exported to '{}'".format(pathname))
+
+    def export_html(self, pathname):
         """
         Export notebook to .html file
         :param pathname: output filename
@@ -346,13 +361,13 @@ class Notebook:
 
         (body, resources) = html_exporter.from_notebook_node(self.nb)
 
-        if not pathname:
-            return body
+        if pathname == '-':
+            nbf.write(self.nb, sys.__stdout__)
+        else:
+            with open(pathname, 'w') as f:
+                f.write(body)
 
-        with open(pathname, 'w') as f:
-            f.write(body)
-
-        logging.info('Notebook exported to {}'.format(pathname))
+        logging.info("HTML notebook exported to '{}'".format(pathname))
 
     def add_argument(self, *args, **kwargs):
         """
@@ -363,6 +378,22 @@ class Notebook:
         """
         self.parser.add_argument(*args, **kwargs)
 
+    def set_cells(self, cells_location):
+        """
+        Set self.cells to function :cells in file pathname.py
+        :param cells_location: cells location, format 'pathname.py:cells'
+        :return:
+        """
+
+        if ':' in cells_location:
+            pathname, func_name = cells_location.split(':')
+        else:
+            pathname = cells_location
+            func_name = 'cells'
+
+        self.cells = get_func(func_name, pathname)
+        # fatal("Function '{}' not found in '{}' or synthax issues".format(func_name, pathname))
+
     def run(self, params=[]):
         """
         Run notebook as an application
@@ -370,31 +401,82 @@ class Notebook:
         :return:
         """
 
+        self.parser.add_argument('cells', help='Cells. Format: pathname.py[:cells_func]', nargs="?", default=None)
+
         self.parser.add_argument('--disable-cache', action="store_true", default=False,
                                  help='Disable execution cache')
 
-        self.parser.add_argument('--clear-cache', action="store_true", default=False,
-                                 help='Rebuild execution cache')
+        self.parser.add_argument('--ignore-cache', action="store_true", default=False,
+                                 help='Ignore existing cache')
 
         self.parser.add_argument('--debug', action="store_true", default=False,
                                  help='Enable debug logging')
 
+        self.parser.add_argument('--param', action='append', help='Cells param. Format: name=value')
+
+        self.add_argument('--export-html', help='Pathname to export to HTML format')
+        self.add_argument('--export-ipynb', help='Pathname to export to Jupyter notebook format')
+
         args = self.parser.parse_args()
+
+        if len(sys.argv) == 1:
+            self.parser.print_help()
+            print()
+            sys.exit(0)
 
         if args.debug:
             logging.basicConfig(level=logging.DEBUG)
 
+        # Process parameters
         kwargs = {}
         for param in params:
             kwargs[param] = getattr(args, param)
 
+        # Process parameters passed with --param
+        if args.param:
+            for param in args.param:
+                k, v = param.split('=', 1)
+                kwargs[k] = v
+
         self.kwargs = kwargs
 
-        logging.info('Running notebook {}'.format(self.__class__.__name__))
+        logging.info('nbpymd:nbapp v{} running on Python v{}.{}.{}'.format(__version__, *sys.version_info[:3]))
+
+        if args.cells:
+            # module and function name passed with args.cells parameter
+            self.set_cells(args.cells)
+            logging.info('Running cells from {}'.format(args.cells))
+        else:
+            # Notebook class extended, .cells method contains the target cell
+            # Let's make sure that this is the case...
+            if self.__class__ == Notebook:
+                fatal('Notebook not extended and cells parameter is missing')
+            logging.info('Running notebook {}'.format(self.__class__.__name__))
+
         logging.info('Disable cache: {}'.format(args.disable_cache))
-        logging.info('Rebuild cache: {}'.format(args.clear_cache))
+        logging.info('Ignore cache: {}'.format(args.ignore_cache))
         logging.info('Parameters: {}'.format(kwargs))
 
-        self.execute(kwargs=kwargs, disable_cache=args.disable_cache, clear_cache=args.clear_cache)
+        self.execute(kwargs=kwargs, disable_cache=args.disable_cache, ignore_cache=args.ignore_cache)
+
+        if args.export_html:
+            self.export_html(args.export_html)
+
+        if args.export_ipynb:
+            self.export_ipynb(args.export_ipynb)
 
         return args
+
+
+def main():
+    """
+    Entry point for nbapp command
+    :return:
+    """
+
+    nb = Notebook()
+    nb.run()
+
+
+if __name__ == "__main__":
+    main()

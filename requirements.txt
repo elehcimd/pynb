@@ -1,6 +1,0 @@
-pep8
-autopep8
-pytest
-setuptools
-twine
-wheel

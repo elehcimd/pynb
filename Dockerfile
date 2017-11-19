@@ -7,16 +7,22 @@ FROM frolvlad/alpine-python3
 RUN apk add --update
 
 # Install build environment and libraries required to install pip packages
-RUN apk add bash bash-completion g++ gcc python3-dev musl-dev libffi-dev openssl-dev make
+RUN apk add bash bash-completion g++ gcc python3-dev musl-dev libffi-dev openssl-dev make vim
 
 # Upgrade pip and install packages required for testing and packaging
 RUN pip install --upgrade pip
+
+# required, otherwise installation of requirements.txt fails
+RUN pip install cffi
+
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 # Install nbpymd
 #RUN pip install nbpymd --no-cache-dir --upgrade
 
-# Set default working directory and run bash
+# Set default working directory
 WORKDIR /code
-CMD ["/bin/bash"]
+
+# Run Jupiter
+CMD ["jupyter", "notebook", "--allow-root", "--ip=0.0.0.0", "--NotebookApp.token=", "./notebooks"]

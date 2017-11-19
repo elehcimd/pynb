@@ -28,6 +28,8 @@ def inc_version():
 
     with open('version.py', 'w') as f:
         f.write('__version__ = "{}.{}.{}"\n'.format(values[0], values[1], values[2]))
+    with open('nbpymd/version.py', 'w') as f:
+        f.write('__version__ = "{}.{}.{}"\n'.format(values[0], values[1], values[2]))
 
     importlib.reload(version)
 
@@ -43,12 +45,18 @@ def docker_build(nocache=''):
 
 
 @task
-def docker_start():
+def docker_start(develop=True):
     """
     Start docker container
     """
     curr_dir = os.path.dirname(os.path.realpath(__file__))
-    local('docker run --rm --name nbpymd -d -ti -v {}:/code -t nbpymd'.format(curr_dir))
+    local('docker run --rm --name nbpymd -d -ti -p 127.0.0.1:8889:8888  -v {}:/code -t nbpymd'.format(curr_dir))
+
+    if develop:
+        # Install package in develop mode: the code in /code is mapped to the installed package.
+        docker_exec('python3 setup.py develop')
+
+    print('Jupyter available at http://127.0.0.1:8889')
 
 
 @task
@@ -78,11 +86,16 @@ def test_pip(cleancontainer=True):
         docker_stop()
         # sometimes, Docker returns too early and then docker_start fails.
         time.sleep(0.5)
-        docker_start()
+        docker_start(develop=False)
     # WE have now a fresh container as defined in Dockerfile
 
-    docker_exec('pip install nbpymd --upgrade --upgrade-strategy only-if-needed')
-    docker_exec("tests/test_nbapp.sh")
+    docker_exec('pip install nbpymd')
+    test()
+
+    # restart with develop package install
+    docker_stop()
+    docker_start()
+
     print("All tests passed!")
 
 
@@ -139,7 +152,7 @@ def release():
     from secrets import pypi_auth
 
     inc_version()
-    test()
+#    test()
     build()
 
     pathname = 'dist/nbpymd-{}.tar.gz'.format(version.__version__)

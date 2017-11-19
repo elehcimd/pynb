@@ -7,3 +7,4 @@ dist
 __pycache__
 .idea
 secrets.py
+.ipynb_checkpoints

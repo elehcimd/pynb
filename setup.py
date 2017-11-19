@@ -1,5 +1,4 @@
 from setuptools import setup
-
 from version import __version__
 
 # Get the long description from the README file
@@ -45,5 +44,9 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 3',
     ],
-
+    entry_points={
+        'console_scripts': [
+            'nbapp = nbpymd.notebook:main',
+        ]
+    },
 )
