@@ -97,7 +97,7 @@ The option `--disable-cache` disables the cache.
 You can ignore the existing cache with option `--ignore-cache`.
 To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
 
-### Using the library interface
+### Using the class interface
 
 To define a notebook, extend the `Notebook` class and define a `cells` method.
 Example:
@@ -142,6 +142,7 @@ There must be an exact match between the parameter names of the `cells` function
 
 All notebook parameter values that have no default value must be provided from the command line. E.g., parameter `b` in the example above.
 
+All command line options available from `nbapp` are also available with the class interface.
 
 ## License
 
