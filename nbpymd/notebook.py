@@ -33,7 +33,7 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         self.disable_cache = False
         self.ignore_cache = False
         self.kwargs = {}
-        self.nb_name = None
+        self.uid = None
 
     def cell_hash(self, cell, cell_index):
         """
@@ -42,10 +42,11 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         :param cell_index: cell index
         :return: hash string
         """
-        s = '{cls} {kwargs} {cell} {index}'.format(cls=self.nb_name,
-                                                   kwargs=self.kwargs,
+        s = '{uid} {kwargs} {cell} {index}'.format(uid=self.uid,
+                                                   kwargs=str(self.kwargs),
                                                    cell=str(cell.source),
                                                    index=cell_index).encode('utf-8')
+
         hash = hashlib.sha1(s).hexdigest()[:8]
         return hash
 
@@ -181,11 +182,14 @@ class Notebook:
         Initialize notebook.
         """
 
-        self.parser = argparse.ArgumentParser(
-            description='nbapp v{} running on Python v{}.{}.{}'.format(__version__, *sys.version_info[:3]))
+        description = 'nbapp v{} running {} on Python v{}.{}.{}'.format(__version__,
+                                                                        self.__class__.__name__,
+                                                                        *sys.version_info[:3])
+
+        self.parser = argparse.ArgumentParser(description=description)
         self.nb = nbf.v4.new_notebook()
         self.nb['cells'] = []
-        self.first_markdown = True
+        self.cells_name = None
 
     def add(self, func, **kwargs):
         """
@@ -194,9 +198,6 @@ class Notebook:
         :param kwargs: variables to inject as first Python cell
         :return:
         """
-
-        if len(kwargs) > 0:
-            self.add_cell_params(kwargs)
 
         params = set(kwargs.keys())
         func_params = set(inspect.getargspec(func).args)
@@ -227,14 +228,16 @@ class Notebook:
                             indent_count += 1
                 line = line[indent_count:]
 
-            if line.strip() == "'''":  # if md block begin or end..
+            if line.strip() == "'''" or line.strip() == "''''''":  # if md block begin/end, or new cell...
                 if len(buffer.strip()) > 0:
                     if not inside_markdown:  # if md block begin: new markdown block! flush buffer
                         self.add_cell_code(buffer)
                     else:  # if md block end: markdown block completed! flush buffer
                         self.add_cell_markdown(buffer)
                 buffer = ""
-                inside_markdown = not inside_markdown
+
+                if line.strip() == "'''":
+                    inside_markdown = not inside_markdown
             else:
                 buffer += line
 
@@ -244,7 +247,16 @@ class Notebook:
             else:
                 self.add_cell_markdown(buffer)
 
-    def add_cell_params(self, params):
+        if len(kwargs) > 0:
+            # We have parameters to inject into the notebook.
+            # If the first cell is Markdown, assume that is the title and
+            # insert parameters as 2nd cell. Otherwise, as 1st cell.
+            if len(self.nb['cells']) > 0 and self.nb['cells'][0].cell_type == 'markdown':
+                self.add_cell_params(kwargs, 1)
+            else:
+                self.add_cell_params(kwargs, 0)
+
+    def add_cell_params(self, params, pos=None):
         """
         Add cell of Python parameters
         :param params: parameters to add
@@ -255,7 +267,7 @@ class Notebook:
         cell_str = '# Parameters:\n'
         for k, v in params.items():
             cell_str += "{} = {}\n".format(k, repr(v))
-        self.add_cell_code(cell_str)
+        self.add_cell_code(cell_str, pos)
 
     def add_cell_footer(self):
         """
@@ -266,13 +278,14 @@ class Notebook:
 
             ---
             * **Notebook class name**: {class_name}
+            * **Notebook cells name**: {cells_name}
             * **Execution time**: {exec_begin}
             * **Execution duration**: {exec_time:.2f}s
-            * **Arguments vector**: {argv}
+            * **Command line**: {argv}
             """
         self.add_cell_markdown(
             m.format(exec_time=self.exec_time, exec_begin=self.exec_begin_dt, class_name=self.__class__.__name__,
-                     argv=str(sys.argv)))
+                     argv=str(sys.argv), cells_name=self.cells_name))
 
     def add_cell_markdown(self, cell_str):
         """
@@ -286,13 +299,9 @@ class Notebook:
         cell = '\n'.join(map(lambda x: x.strip(), cell_str.split('\n')))
         cell = nbf.v4.new_markdown_cell(cell)
 
-        if self.first_markdown:
-            self.nb['cells'].insert(0, cell)
-            self.first_markdown = False
-        else:
-            self.nb['cells'].append(cell)
+        self.nb['cells'].append(cell)
 
-    def add_cell_code(self, cell_str):
+    def add_cell_code(self, cell_str, pos=None):
         """
         Add Python cell
         :param cell_str: cell content
@@ -300,9 +309,13 @@ class Notebook:
         """
         logging.debug("add_cell_code: {}".format(cell_str))
         cell = nbf.v4.new_code_cell(cell_str)
-        self.nb['cells'].append(cell)
 
-    def execute(self, kwargs={}, disable_cache=False, ignore_cache=False):
+        if pos is None:
+            self.nb['cells'].append(cell)
+        else:
+            self.nb['cells'].insert(pos, cell)
+
+    def execute(self, uid, kwargs={}, disable_cache=False, ignore_cache=False):
         """
         Execute notebook
         :return: self
@@ -317,7 +330,7 @@ class Notebook:
         ep.disable_cache = disable_cache
         ep.ignore_cache = ignore_cache
         ep.kwargs = kwargs
-        ep.nb_name = self.__class__.__name__
+        ep.uid = uid
 
         # Execute the notebook
 
@@ -378,6 +391,9 @@ class Notebook:
         """
         self.parser.add_argument(*args, **kwargs)
 
+    def cells(self):
+        pass
+
     def set_cells(self, cells_location):
         """
         Set self.cells to function :cells in file pathname.py
@@ -396,14 +412,14 @@ class Notebook:
         except:
             fatal("Function '{}' not found in '{}' or synthax issues".format(func_name, pathname))
 
-    def run(self, params=[]):
+    def run(self):
         """
         Run notebook as an application
         :param params: parameters to inject in the notebook
         :return:
         """
 
-        self.parser.add_argument('cells', help='Cells. Format: pathname.py[:cells_func]', nargs="?", default=None)
+        self.parser.add_argument('cells', help='Cells. Format: pathname.py[:cells_func]', nargs='?')
 
         self.parser.add_argument('--disable-cache', action="store_true", default=False,
                                  help='Disable execution cache')
@@ -416,23 +432,29 @@ class Notebook:
 
         self.parser.add_argument('--param', action='append', help='Cells param. Format: name=value')
 
+        self.parser.add_argument('--id', default='', help='Notebook unique id')
+
         self.add_argument('--export-html', help='Pathname to export to HTML format')
         self.add_argument('--export-ipynb', help='Pathname to export to Jupyter notebook format')
 
         args = self.parser.parse_args()
 
-        if len(sys.argv) == 1:
-            self.parser.print_help()
-            print()
-            sys.exit(0)
-
         if args.debug:
             logging.basicConfig(level=logging.DEBUG)
 
-        # Process parameters
+        # Process parameters passed by custom arguments
         kwargs = {}
-        for param in params:
-            kwargs[param] = getattr(args, param)
+
+        func_params = set(inspect.getargspec(self.cells).args)
+
+        # ignore self, which is present when extending Notebook.
+        if 'self' in func_params:
+            func_params.remove('self')
+
+        for param in func_params:
+            kwargs[param] = getattr(args, param, None)
+            if kwargs[param] is None:
+                fatal('Notebook parameter {} required but not found.'.format(param))
 
         # Process parameters passed with --param
         if args.param:
@@ -442,24 +464,33 @@ class Notebook:
 
         self.kwargs = kwargs
 
-        logging.info('nbpymd:nbapp v{} running on Python v{}.{}.{}'.format(__version__, *sys.version_info[:3]))
+        logging.info('nbapp v{} running {} on Python v{}.{}.{}'.format(__version__,
+                                                                       self.__class__.__name__,
+                                                                       *sys.version_info[:3]))
 
         if args.cells:
             # module and function name passed with args.cells parameter
             self.set_cells(args.cells)
             logging.info('Running cells from {}'.format(args.cells))
+            uid = args.cells
+            self.cells_name = args.cells
         else:
             # Notebook class extended, .cells method contains the target cell
             # Let's make sure that this is the case...
             if self.__class__ == Notebook:
                 fatal('Notebook not extended and cells parameter is missing')
             logging.info('Running notebook {}'.format(self.__class__.__name__))
+            uid = self.__class__.__name__
 
+        if args.id:
+            uid += ':' + args.id
+
+        logging.info("Unique id: '{}'".format(uid))
         logging.info('Disable cache: {}'.format(args.disable_cache))
         logging.info('Ignore cache: {}'.format(args.ignore_cache))
         logging.info('Parameters: {}'.format(kwargs))
 
-        self.execute(kwargs=kwargs, disable_cache=args.disable_cache, ignore_cache=args.ignore_cache)
+        self.execute(uid=uid, kwargs=kwargs, disable_cache=args.disable_cache, ignore_cache=args.ignore_cache)
 
         if args.export_html:
             self.export_html(args.export_html)

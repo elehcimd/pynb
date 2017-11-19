@@ -13,7 +13,7 @@ class MyTestNotebook(Notebook):
 def main():
     nb = MyTestNotebook()
     nb.add_argument('--N', default=10, type=int)
-    nb.run(params=['N'])
+    nb.run()
     nb.export_ipynb('-')
 
 
