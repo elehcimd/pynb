@@ -307,6 +307,9 @@ class Notebook:
         :param cell_str: cell content
         :return:
         """
+
+        cell_str = cell_str.strip()
+
         logging.debug("add_cell_code: {}".format(cell_str))
         cell = nbf.v4.new_code_cell(cell_str)
 

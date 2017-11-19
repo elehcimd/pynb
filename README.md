@@ -68,6 +68,9 @@ To run the notebook defined in ``sum.py`:
 nbapp sum.py --param a=3 --param b=5
 ```
 
+Parameters are passed from command line with `--param` options, whose value is formatted as `name:value`.
+Parameter values are strings and might require casting to their proper type (E.g., int) in the notebook.
+
 Parameters `a` and `b` are injected in the notebook at execution time as an additional Python cell.
 A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`.
 
