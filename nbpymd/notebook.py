@@ -440,6 +440,13 @@ class Notebook:
         self.add_argument('--export-html', help='Pathname to export to HTML format')
         self.add_argument('--export-ipynb', help='Pathname to export to Jupyter notebook format')
 
+        if len(sys.argv) == 1 and self.__class__ == Notebook:
+            # no parameters and Notebook class not extended:
+            # print help and exit.
+            self.parser.print_help()
+            print()
+            sys.exit(1)
+
         args = self.parser.parse_args()
 
         if args.debug:
@@ -457,7 +464,7 @@ class Notebook:
         for param in func_params:
             kwargs[param] = getattr(args, param, None)
             if kwargs[param] is None:
-                fatal('Notebook parameter {} required but not found.'.format(param))
+                fatal('Notebook parameter {} required but not found'.format(param))
 
         # Process parameters passed with --param
         if args.param:
@@ -481,7 +488,7 @@ class Notebook:
             # Notebook class extended, .cells method contains the target cell
             # Let's make sure that this is the case...
             if self.__class__ == Notebook:
-                fatal('Notebook not extended and cells parameter is missing')
+                fatal('Notebook class not extended and cells parameter is missing')
             logging.info('Running notebook {}'.format(self.__class__.__name__))
             uid = self.__class__.__name__
 

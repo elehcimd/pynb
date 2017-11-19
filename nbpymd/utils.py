@@ -35,5 +35,5 @@ def fatal(msg):
     :param msg: message to print
     :return:
     """
-    logging.fatal(msg)
+    logging.fatal('{}; exiting.'.format(msg))
     sys.exit(1)

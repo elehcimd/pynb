@@ -90,7 +90,12 @@ The caching system allows you to reuse transparently the Python sessions and out
 
 * **index**: Cell position
 
-Cache hits speed up significantly the notebook execution. Cache misses result in the invalidation of the cache. The cache is maintained in temporary files. To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
+Cache hits speed up significantly the notebook execution. Cache misses result in the invalidation of the cache. The cache is maintained in temporary files.
+
+The caching system is enabled by default.
+The option `--disable-cache` disables the cache.
+You can ignore the existing cache with option `--ignore-cache`.
+To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
 
 ### Using the library interface
 
