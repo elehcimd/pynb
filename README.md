@@ -70,6 +70,8 @@ Values are strings and might require casting to their proper type inside the not
 
 The default name of the function defining the notebook is `cells`. A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`.
 
+If you only want to convert the notebook without executing it, you can skip the execution with the `--no-exec` option.
+
 #### Exporting
 
 The options `--export-html` and `--export-ipynb` let you export to .html and .ipynb file formats, respectively. The special output pathname `-` points to standard output.
