@@ -14,7 +14,7 @@ if __name__ == "__main__":
     nb.add_argument('--b', type=int)
     nb.add_argument('--print-ipynb', action="store_true", default=False)
 
-    args = nb.run()
+    nb.run()
 
-    if args.print_ipynb:
+    if nb.args.print_ipynb:
         nb.export_ipynb('-')

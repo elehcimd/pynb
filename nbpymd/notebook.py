@@ -190,6 +190,7 @@ class Notebook:
         self.nb = nbf.v4.new_notebook()
         self.nb['cells'] = []
         self.cells_name = None
+        self.args = None
 
     def add(self, func, **kwargs):
         """
@@ -415,10 +416,10 @@ class Notebook:
         except:
             fatal("Function '{}' not found in '{}' or synthax issues".format(func_name, pathname))
 
-    def run(self):
+    def parse_args(self, **kwargs):
         """
-        Run notebook as an application
-        :param params: parameters to inject in the notebook
+        Parse arguments
+        :param kwargs: optional params
         :return:
         """
 
@@ -447,9 +448,18 @@ class Notebook:
             print()
             sys.exit(1)
 
-        args = self.parser.parse_args()
+        self.args = self.parser.parse_args()
 
-        if args.debug:
+    def run(self):
+        """
+        Run notebook as an application
+        :param params: parameters to inject in the notebook
+        :return:
+        """
+
+        self.parse_args()
+
+        if self.args.debug:
             logging.basicConfig(level=logging.DEBUG)
 
         # Process parameters passed by custom arguments
@@ -462,13 +472,13 @@ class Notebook:
             func_params.remove('self')
 
         for param in func_params:
-            kwargs[param] = getattr(args, param, None)
+            kwargs[param] = getattr(self.args, param, None)
             if kwargs[param] is None:
                 fatal('Notebook parameter {} required but not found'.format(param))
 
         # Process parameters passed with --param
-        if args.param:
-            for param in args.param:
+        if self.args.param:
+            for param in self.args.param:
                 k, v = param.split('=', 1)
                 kwargs[k] = v
 
@@ -478,12 +488,12 @@ class Notebook:
                                                                        self.__class__.__name__,
                                                                        *sys.version_info[:3]))
 
-        if args.cells:
+        if self.args.cells:
             # module and function name passed with args.cells parameter
-            self.set_cells(args.cells)
-            logging.info('Running cells from {}'.format(args.cells))
-            uid = args.cells
-            self.cells_name = args.cells
+            self.set_cells(self.args.cells)
+            logging.info('Running cells from {}'.format(self.args.cells))
+            uid = self.args.cells
+            self.cells_name = self.args.cells
         else:
             # Notebook class extended, .cells method contains the target cell
             # Let's make sure that this is the case...
@@ -492,23 +502,21 @@ class Notebook:
             logging.info('Running notebook {}'.format(self.__class__.__name__))
             uid = self.__class__.__name__
 
-        if args.append_id:
-            uid += ':' + args.append_id
+        if self.args.append_id:
+            uid += ':' + self.args.append_id
 
         logging.info("Unique id: '{}'".format(uid))
-        logging.info('Disable cache: {}'.format(args.disable_cache))
-        logging.info('Ignore cache: {}'.format(args.ignore_cache))
+        logging.info('Disable cache: {}'.format(self.args.disable_cache))
+        logging.info('Ignore cache: {}'.format(self.args.ignore_cache))
         logging.info('Parameters: {}'.format(kwargs))
 
-        self.execute(uid=uid, kwargs=kwargs, disable_cache=args.disable_cache, ignore_cache=args.ignore_cache)
+        self.execute(uid=uid, kwargs=kwargs, disable_cache=self.args.disable_cache, ignore_cache=self.args.ignore_cache)
 
-        if args.export_html:
-            self.export_html(args.export_html)
+        if self.args.export_html:
+            self.export_html(self.args.export_html)
 
-        if args.export_ipynb:
-            self.export_ipynb(args.export_ipynb)
-
-        return args
+        if self.args.export_ipynb:
+            self.export_ipynb(self.args.export_ipynb)
 
 
 def main():
