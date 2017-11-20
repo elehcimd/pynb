@@ -22,11 +22,8 @@ pip install nbpymd
 
 `nbpymd` can be used in two ways: as a command line tool and as a library. The command line tool `nbapp` is tailored for simplicity and is the fastest way to write & run a notebook. The library access provides a finer control on parametrization and execution.
 
-On MacOS, ignore these warning messages:
+On MacOS, ignore these warning messages `RuntimeWarning: Failed to set sticky bit on`. It's a known [bug](https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710).
 
-```
-RuntimeWarning: Failed to set sticky bit on [...]`. It's a known annoying (bug)[https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710].
-```
 
 ### Notebook format
 
@@ -60,7 +57,7 @@ Lines whose content is either `'''` or `''''''` have a special meaning: Markdown
 
 In presence of parameters, if the first cell is a Markdown cell, it is treated as the title and the injected Python cell with parameters is inserted as the second cell.
 
-### Using the `nbapp` command line tool
+### The `nbapp` command line tool
 
 To run the notebook defined in `sum.py`:
 
@@ -97,7 +94,7 @@ The option `--disable-cache` disables the cache.
 You can ignore the existing cache with option `--ignore-cache`.
 To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
 
-### Using the class interface
+### The `Notebook` class interface
 
 To define a notebook, extend the `Notebook` class and define a `cells` method.
 Example:
@@ -134,9 +131,9 @@ python3 sumapp.py --b 3 --print-ipynb
 
 Class `SumNotebook` extends `Notebook` and defines the notebook in method `cells`.
 
-Method `Notebook.add_argument` maps to (ArgumentParser.add_argument)[https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.add_argument] and lets you define additional notebook parameters or custom options.
+Method `Notebook.add_argument` maps to [ArgumentParser.add_argument](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.add_argument) and lets you define additional notebook parameters or custom options.
 
-Method `Notebook.run` takes care of executing the notebook taking into account the command line arguments, and returns the object returned by (ArgumentParser.parse_args)[https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args]. The user-defined parameter '--print-ipynb' is handled using it.
+Method `Notebook.run` takes care of executing the notebook taking into account the command line arguments, and returns the object returned by [ArgumentParser.parse_args](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args). The user-defined parameter '--print-ipynb' is handled using it.
 
 There must be an exact match between the parameter names of the `cells` function and the attribute names of the object returned by [ArgumentParser.parse_args].
 
@@ -146,14 +143,13 @@ All command line options available from `nbapp` are also available with the clas
 
 ## License
 
-The nbpymd project is released under the MIT license. Please see `LICENSE.txt`.
+The nbpymd project is released under the MIT license. Please see [LICENSE.txt](https://github.com/minodes/nbpymd/blob/master/LICENSE.txt).
 
 
 ## Development
 
 Tests, builds and releases are managed with `Fabric`.
 The build, test and release environment is managed with `Docker`.
-
 Install Docker and Fabric in your system. To install Fabric:
 
 ```
@@ -167,9 +163,9 @@ Any changes to the package dependencies in `setup.py` must be reflected in `requ
 
 ### Jupyter server
 
-The Jupyter server is reachable at [http://127.0.0.1:8889/tree].
+The Jupyter server is reachable at http://127.0.0.1:8889/tree.
 
-### Uploading a new release
+### Building and publishing a new release
 
 Create a file `secrets.py` in the project directory with the Pypi credentials in this format:
 
