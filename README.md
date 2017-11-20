@@ -57,7 +57,7 @@ Lines whose content is either `'''` or `''''''` have a special meaning: Markdown
 
 In presence of parameters, if the first cell is a Markdown cell, it is treated as the title and the injected Python cell with parameters is inserted as the second cell.
 
-### Using the `nbapp` command line tool
+### The `nbapp` command line tool
 
 To run the notebook defined in `sum.py`:
 
@@ -94,7 +94,7 @@ The option `--disable-cache` disables the cache.
 You can ignore the existing cache with option `--ignore-cache`.
 To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
 
-### Using the class interface
+### The `Notebook` class interface
 
 To define a notebook, extend the `Notebook` class and define a `cells` method.
 Example:
