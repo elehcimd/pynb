@@ -150,7 +150,6 @@ The nbpymd project is released under the MIT license. Please see [LICENSE.txt](h
 
 Tests, builds and releases are managed with `Fabric`.
 The build, test and release environment is managed with `Docker`.
-
 Install Docker and Fabric in your system. To install Fabric:
 
 ```
