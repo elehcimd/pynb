@@ -6,7 +6,7 @@
 * Version control
 * Development of notebooks as regular Python code
 * Parametrized notebooks
-* Programmatic and command line notebook execution
+* Programmatic and batch notebook execution
 * Reproducible results at any time
 * Notebook cell execution cache
 
