@@ -64,14 +64,13 @@ nbapp sum.py --param a=3 --param b=5
 ```
 
 Parameters are passed from the command line with `--param` options, whose value is formatted as `name:value`.
-Parameter values are strings and might require casting to their proper type (E.g., int) inside the notebook.
+Values are strings and might require casting to their proper type inside the notebook (E.g., int).
 
-Parameters `a` and `b` are injected in the notebook at execution time as an additional Python cell.
 A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`.
 
 #### Exporting
 
-Options `--export-html` and `--export-ipynb` let you export to .html and .ipynb file formats, respectively. The special output pathname `-` points to standard output.
+The options `--export-html` and `--export-ipynb` let you export to .html and .ipynb file formats, respectively. The special output pathname `-` points to standard output.
 
 #### Caching
 
@@ -97,7 +96,6 @@ To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
 To define a notebook, extend the `Notebook` class and define a `cells` method.
 Example:
 
-
 ```
 # Contents of sumapp.py
 
@@ -115,9 +113,9 @@ if __name__ == "__main__":
     nb.add_argument('--b', type=int)
     nb.add_argument('--print-ipynb', action="store_true", default=False)
 
-    args = nb.run()
+    nb.run()
 
-    if args.print_ipynb:
+    if nb.args.print_ipynb:
         nb.export_ipynb('-')
 ```
 
@@ -131,7 +129,9 @@ Class `SumNotebook` extends `Notebook` and defines the notebook in method `cells
 
 Method `Notebook.add_argument` maps to [ArgumentParser.add_argument](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.add_argument) and lets you define additional notebook parameters or custom options.
 
-Method `Notebook.run` takes care of executing the notebook taking into account the command line arguments, and returns the object returned by [ArgumentParser.parse_args](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args). The user-defined parameter '--print-ipynb' is handled using it.
+Method `Notebook.run` takes care of executing the notebook taking into account the command line arguments.
+
+After running the notebook, the attribute `nb.args` contains the object returned by [ArgumentParser.parse_args](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args) and can be used to handle additional user-defined options. E.g., `--print-ipynb`. If you want to handle user-defined parameters before calling `nb.run()`, you can call `nb.parse_args()` to initialize explicitly `nb.args`.
 
 There must be an exact match between the parameter names of the `cells` function and the attribute names of the object returned by [ArgumentParser.parse_args].
 
