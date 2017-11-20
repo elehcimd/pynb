@@ -319,7 +319,7 @@ class Notebook:
         else:
             self.nb['cells'].insert(pos, cell)
 
-    def execute(self, uid, kwargs={}, disable_cache=False, ignore_cache=False):
+    def process(self, uid, kwargs={}, no_exec=False, disable_cache=False, ignore_cache=False):
         """
         Execute notebook
         :return: self
@@ -338,11 +338,12 @@ class Notebook:
 
         # Execute the notebook
 
-        with warnings.catch_warnings():
-            # On MacOS, annoying warning "RuntimeWarning: Failed to set sticky bit on"
-            # Let's suppress it.
-            warnings.simplefilter("ignore")
-            ep.preprocess(self.nb, {'metadata': {'path': '.'}})
+        if no_exec is False:
+            with warnings.catch_warnings():
+                # On MacOS, annoying warning "RuntimeWarning: Failed to set sticky bit on"
+                # Let's suppress it.
+                warnings.simplefilter("ignore")
+                ep.preprocess(self.nb, {'metadata': {'path': '.'}})
 
         self.exec_time = time.perf_counter() - self.exec_begin
 
@@ -431,6 +432,9 @@ class Notebook:
         self.parser.add_argument('--ignore-cache', action="store_true", default=False,
                                  help='Ignore existing cache')
 
+        self.parser.add_argument('--no-exec', action="store_true", default=False,
+                                 help='Do not execute notebook')
+
         self.parser.add_argument('--debug', action="store_true", default=False,
                                  help='Enable debug logging')
 
@@ -511,7 +515,11 @@ class Notebook:
         logging.info('Ignore cache: {}'.format(self.args.ignore_cache))
         logging.info('Parameters: {}'.format(kwargs))
 
-        self.execute(uid=uid, kwargs=kwargs, disable_cache=self.args.disable_cache, ignore_cache=self.args.ignore_cache)
+        self.process(uid=uid,
+                     kwargs=kwargs,
+                     no_exec=self.args.no_exec,
+                     disable_cache=self.args.disable_cache,
+                     ignore_cache=self.args.ignore_cache)
 
         if self.args.export_html:
             self.export_html(self.args.export_html)
