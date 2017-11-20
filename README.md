@@ -141,7 +141,9 @@ All notebook parameter values that have no default value must be provided from t
 
 All command line options available from `nbapp` are also available with the class interface.
 
-## License
+## Credits and license
+
+Thank You to [Minodes](http://www.minodes.com) for supporting this Open Source project.
 
 The nbpymd project is released under the MIT license. Please see [LICENSE.txt](https://github.com/minodes/nbpymd/blob/master/LICENSE.txt).
 
