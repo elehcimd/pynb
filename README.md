@@ -165,7 +165,7 @@ Any changes to the package dependencies in `setup.py` must be reflected in `requ
 
 The Jupyter server is reachable at http://127.0.0.1:8889/tree.
 
-### Uploading a new release
+### Building and publishing a new release
 
 Create a file `secrets.py` in the project directory with the Pypi credentials in this format:
 
