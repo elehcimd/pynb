@@ -22,11 +22,8 @@ pip install nbpymd
 
 `nbpymd` can be used in two ways: as a command line tool and as a library. The command line tool `nbapp` is tailored for simplicity and is the fastest way to write & run a notebook. The library access provides a finer control on parametrization and execution.
 
-On MacOS, ignore these warning messages:
+On MacOS, ignore these warning messages `RuntimeWarning: Failed to set sticky bit on`. It's a [known annoying bug](https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710).
 
-```
-RuntimeWarning: Failed to set sticky bit on [...]`. It's a known annoying (bug)[https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710].
-```
 
 ### Notebook format
 
