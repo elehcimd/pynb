@@ -25,7 +25,7 @@ pip install nbpymd
 On MacOS, ignore these warning messages `RuntimeWarning: Failed to set sticky bit on`. It's a known [bug](https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710).
 
 
-### Notebook format
+### Notebook Python file format
 
 A notebook is defined as a Python function with Markdown text embedded in multi-line string blocks. Notebooks can contain only Python and Markdown cells. Example:
 
