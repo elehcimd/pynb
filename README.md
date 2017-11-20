@@ -8,7 +8,7 @@
 * Parametrized notebooks
 * Programmatic and command line notebook execution
 * Reproducible results at any time
-* Notebook execution cache
+* Notebook cell execution cache
 
 ## Installation
 
@@ -62,7 +62,7 @@ In presence of parameters, if the first cell is a Markdown cell, it is treated a
 
 ### Using the `nbapp` command line tool
 
-To run the notebook defined in ``sum.py`:
+To run the notebook defined in `sum.py`:
 
 ```
 nbapp sum.py --param a=3 --param b=5
@@ -187,7 +187,7 @@ fab release
 ```
 
 
-### Tests
+### Running the tests
 
 To run the py.test tests:
 
