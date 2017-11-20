@@ -135,7 +135,7 @@ Method `Notebook.run` takes care of executing the notebook taking into account t
 
 After running the notebook, the attribute `nb.args` contains the object returned by [ArgumentParser.parse_args](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args) and can be used to handle additional user-defined options. E.g., `--print-ipynb`. If you want to handle user-defined parameters before calling `nb.run()`, you can call `nb.parse_args()` to initialize explicitly `nb.args`.
 
-There must be an exact match between the parameter names of the `cells` function and the attribute names of the object returned by [ArgumentParser.parse_args](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args).
+There must be an exact match between the parameter names of the `cells` function and `argparse` attribute names.
 
 All notebook parameter values that have no default value must be provided from the command line. E.g., parameter `b` in the example above.
 
