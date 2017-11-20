@@ -457,7 +457,8 @@ class Notebook:
         :return:
         """
 
-        self.parse_args()
+        if not self.args:
+            self.parse_args()
 
         if self.args.debug:
             logging.basicConfig(level=logging.DEBUG)
