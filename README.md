@@ -51,13 +51,9 @@ def cells(a, b):
     a + b
 ```
 
-This notebook is composed by five (5) cells: `[md, py, py, md, py]`.
-
-The names of the parameters of the `cells` function are mapped to command line arguments. In the example above, we have two arguments `a` and `b`.
+The names of the parameters of the `cells` function are mapped to command line arguments. In the example above, we have two arguments `a` and `b`. This notebook is composed by five (5) cells: `[md, py, py, md, py]`. At runtime, the parameter values are injected into the notebook as an additional Python cell. If the first cell is a Markdown cell, the new parameters Python cell is injected after it.
 
 Lines whose content is either `'''` or `''''''` have a special meaning: Markdown text is delimited by `'''` and `''''''` serves as cell separator. Markdown text delimiters serve also as cell separators. An empty Markdown cell `'''\n'''` is equivalent to `''''''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away.
-
-In presence of parameters, if the first cell is a Markdown cell, it is treated as the "title cell" and the injected Python cell with the parameters is inserted as the second cell.
 
 ### The `nbapp` command line tool
 
@@ -68,7 +64,7 @@ nbapp sum.py --param a=3 --param b=5
 ```
 
 Parameters are passed from the command line with `--param` options, whose value is formatted as `name:value`.
-Parameter values are strings and might require casting to their proper type (E.g., int) in the notebook.
+Parameter values are strings and might require casting to their proper type (E.g., int) inside the notebook.
 
 Parameters `a` and `b` are injected in the notebook at execution time as an additional Python cell.
 A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`.
