@@ -146,7 +146,7 @@ All command line options available from `nbapp` are also available with the clas
 
 ## License
 
-The nbpymd project is released under the MIT license. Please see `LICENSE.txt`.
+The nbpymd project is released under the MIT license. Please see [LICENSE.txt](https://github.com/minodes/nbpymd/blob/master/LICENSE.txt).
 
 
 ## Development
@@ -167,7 +167,7 @@ Any changes to the package dependencies in `setup.py` must be reflected in `requ
 
 ### Jupyter server
 
-The Jupyter server is reachable at (http://127.0.0.1:8889/tree).
+The Jupyter server is reachable at http://127.0.0.1:8889/tree.
 
 ### Uploading a new release
 
