@@ -51,11 +51,13 @@ def cells(a, b):
     a + b
 ```
 
-The parameter names of the `cells` function are mapped to command line arguments. In the example, we have two arguments `a` and `b`.
+This notebook is composed by five (5) cells: `[md, py, py, md, py]`.
 
-Lines whose content is either `'''` or `''''''` have a special meaning: Markdown cells are delimited by `'''` and `''''''` serves as separator between Python cells. Markdown cell delimiters serve also as separators between Python and Markdown cells. An empty Markdown cell `'''\n'''` is equivalent to `''''''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away.
+The names of the parameters of the `cells` function are mapped to command line arguments. In the example above, we have two arguments `a` and `b`.
 
-In presence of parameters, if the first cell is a Markdown cell, it is treated as the title and the injected Python cell with parameters is inserted as the second cell.
+Lines whose content is either `'''` or `''''''` have a special meaning: Markdown text is delimited by `'''` and `''''''` serves as cell separator. Markdown text delimiters serve also as cell separators. An empty Markdown cell `'''\n'''` is equivalent to `''''''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away.
+
+In presence of parameters, if the first cell is a Markdown cell, it is treated as the "title cell" and the injected Python cell with the parameters is inserted as the second cell.
 
 ### The `nbapp` command line tool
 
