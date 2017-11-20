@@ -55,7 +55,7 @@ The names of the function parameters are mapped to command line arguments. In th
 
 Lines whose content is either `'''` or `''''''` have a special meaning: Markdown text is delimited by `'''` and `''''''` serves as cell separator. Markdown text delimiters serve also as cell separators. An empty Markdown cell `'''\n'''` is equivalent to `''''''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away.
 
-The default name for the notebook function is `cells`. A Python module can contain several Python functions defining multiple noetbooks. You can find some examples in the (notebooks)[https://github.com/minodes/nbpymd/tree/master/notebooks] directory.
+The default name for the notebook function is `cells`. A Python module can contain several Python functions defining multiple noetbooks. You can find some examples in the [notebooks](https://github.com/minodes/nbpymd/tree/master/notebooks) directory.
 
 ### The `nbapp` command line tool
 
