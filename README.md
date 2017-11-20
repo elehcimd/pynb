@@ -134,9 +134,9 @@ python3 sumapp.py --b 3 --print-ipynb
 
 Class `SumNotebook` extends `Notebook` and defines the notebook in method `cells`.
 
-Method `Notebook.add_argument` maps to (ArgumentParser.add_argument)[https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.add_argument] and lets you define additional notebook parameters or custom options.
+Method `Notebook.add_argument` maps to [ArgumentParser.add_argument](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.add_argument) and lets you define additional notebook parameters or custom options.
 
-Method `Notebook.run` takes care of executing the notebook taking into account the command line arguments, and returns the object returned by (ArgumentParser.parse_args)[https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args]. The user-defined parameter '--print-ipynb' is handled using it.
+Method `Notebook.run` takes care of executing the notebook taking into account the command line arguments, and returns the object returned by [ArgumentParser.parse_args](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args). The user-defined parameter '--print-ipynb' is handled using it.
 
 There must be an exact match between the parameter names of the `cells` function and the attribute names of the object returned by [ArgumentParser.parse_args].
 
@@ -167,7 +167,7 @@ Any changes to the package dependencies in `setup.py` must be reflected in `requ
 
 ### Jupyter server
 
-The Jupyter server is reachable at [http://127.0.0.1:8889/tree].
+The Jupyter server is reachable at (http://127.0.0.1:8889/tree).
 
 ### Uploading a new release
 
