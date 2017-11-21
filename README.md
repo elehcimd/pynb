@@ -14,7 +14,6 @@
 pip install nbpymd
 ```
 
-
 ## Notebook Python synthax
 
 A notebook is defined as a Python function with Markdown text embedded in multi-line string blocks. Notebooks can contain only Python and Markdown cells. Example:
@@ -49,9 +48,9 @@ A Python module can contain several Python functions defining multiple noetbooks
 
 ## Usage
 
-`nbpymd` can be used in two ways: as a command line tool and as a library. The command line tool `nbapp` is tailored for simplicity and is the fastest way to write & run a notebook. The library access provides a finer control on parametrization and execution.
+`nbpymd` can be used in two ways: as a command line tool (`nbapp`) and as a package class (`nbpymd.Notebook`). The command line tool `nbapp` is tailored for simplicity and is the fastest way to write & run a notebook. The `nbpymd.Notebook` class provides a finer control on parametrization and execution.
 
-### The `nbapp` command line tool
+### Method 1: The `nbapp` command line tool
 
 To run the notebook defined in `sum.py`:
 
@@ -89,7 +88,7 @@ The option `--disable-cache` disables the cache.
 You can ignore the existing cache with option `--ignore-cache`.
 To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
 
-### The `Notebook` class interface
+### Method 2: The `Notebook` class interface
 
 To define a notebook, extend the `Notebook` class and define a `cells` method.
 Example:
