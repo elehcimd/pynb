@@ -1,10 +1,10 @@
 # nbpymd: [n]ote[b]ooks as [py]thon + [m]ark[d]own
 
-`nbpymd` lets you manage Jupyter notebooks as plain Python code with embedded Markdown text:
+`nbpymd` lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling notebooks with:
 
 * Version control and higher code quality
 * Parametrized, programmatic and batch execution
-* Notebook execution cache
+* Execution cache
 
 ## Installation
 
@@ -14,14 +14,8 @@
 pip install nbpymd
 ```
 
-## Usage
 
-`nbpymd` can be used in two ways: as a command line tool and as a library. The command line tool `nbapp` is tailored for simplicity and is the fastest way to write & run a notebook. The library access provides a finer control on parametrization and execution.
-
-On MacOS, ignore these warning messages `RuntimeWarning: Failed to set sticky bit on`. It's a known [bug](https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710).
-
-
-### Notebook Python file format
+## Notebook Python synthax
 
 A notebook is defined as a Python function with Markdown text embedded in multi-line string blocks. Notebooks can contain only Python and Markdown cells. Example:
 
@@ -53,6 +47,10 @@ Lines whose content is either `'''` or `''''''` have a special meaning: Markdown
 
 A Python module can contain several Python functions defining multiple noetbooks. You can find some examples in the [notebooks](https://github.com/minodes/nbpymd/tree/master/notebooks) directory.
 
+## Usage
+
+`nbpymd` can be used in two ways: as a command line tool and as a library. The command line tool `nbapp` is tailored for simplicity and is the fastest way to write & run a notebook. The library access provides a finer control on parametrization and execution.
+
 ### The `nbapp` command line tool
 
 To run the notebook defined in `sum.py`:
@@ -72,7 +70,7 @@ If you only want to convert the notebook without executing it, you can skip the 
 
 The options `--export-html` and `--export-ipynb` let you export to .html and .ipynb file formats, respectively. The special output pathname `-` points to standard output.
 
-#### Caching
+## Execution cache
 
 The caching system allows you to reuse transparently the Python sessions and outputs of previous notebook executions. Each cell is associated to a hash generated from these fields:
 
@@ -145,6 +143,9 @@ Thank You to [Minodes](http://www.minodes.com) for supporting this Open Source p
 
 The nbpymd project is released under the MIT license. Please see [LICENSE.txt](https://github.com/minodes/nbpymd/blob/master/LICENSE.txt).
 
+## Known issues
+
+On MacOS, ignore these warning messages `RuntimeWarning: Failed to set sticky bit on`. It's a known [bug](https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710).
 
 ## Development
 
