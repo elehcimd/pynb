@@ -10,4 +10,4 @@ nbformat
 dill
 ipykernel
 ipython
-
+Fabric3
