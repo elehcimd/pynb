@@ -37,11 +37,11 @@ def inc_version():
 
 
 @task
-def docker_build(nocache=''):
+def docker_build(options=''):
     """
     Build docker image
     """
-    local('docker build {} -t nbpymd .'.format(nocache))
+    local('docker build {} -t nbpymd .'.format(options))
 
 
 @task
