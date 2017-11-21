@@ -1,14 +1,10 @@
 # nbpymd: [n]ote[b]ooks as [py]thon + [m]ark[d]own
 
-`nbpymd` lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling:
+`nbpymd` lets you manage Jupyter notebooks as plain Python code with embedded Markdown text:
 
-* Higher code quality
-* Version control
-* Development of notebooks as regular Python code
-* Parametrized notebooks
-* Programmatic and batch notebook execution
-* Reproducible results at any time
-* Notebook cell execution cache
+* Version control and higher code quality
+* Parametrized, programmatic and batch execution
+* Notebook execution cache
 
 ## Installation
 
