@@ -1,4 +1,4 @@
-# nbpymd: [n]ote[b]ooks as [py]thon with embedded [m]ark[d]own
+# Notebooks as Python with embedded Markdown
 
 `nbpymd` lets you manage Jupyter notebooks as plain Python code with Markdown text embedded into comments.
 
