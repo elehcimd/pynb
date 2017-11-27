@@ -5,5 +5,5 @@ include LICENSE.txt
 include version.py
 
 # Exclude temporary files and directories
-recursive-exclude nbpymd __pycache__
-recursive-exclude nbpymd *.py[co]
+recursive-exclude pynb __pycache__
+recursive-exclude pynb *.py[co]

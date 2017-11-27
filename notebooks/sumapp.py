@@ -1,6 +1,6 @@
 # Contents of sumapp.py
 
-from nbpymd.notebook import Notebook
+from pynb.notebook import Notebook
 
 
 class SumNotebook(Notebook):

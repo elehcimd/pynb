@@ -2,7 +2,7 @@ import os
 
 from fabric.api import local
 
-from nbpymd.notebook import Notebook
+from pynb.notebook import Notebook
 
 
 class MyTestNotebook(Notebook):

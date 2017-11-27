@@ -13,8 +13,8 @@ import nbformat as nbf
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
 
-from nbpymd.utils import get_func, fatal
-from nbpymd.version import __version__
+from pynb.utils import get_func, fatal
+from pynb.version import __version__
 
 logging.basicConfig(level=logging.INFO)
 
@@ -59,8 +59,8 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         """
 
         hash = self.cell_hash(cell, cell_index)
-        fname_session = '/tmp/nbpymd-cache-{}-session.dill'.format(hash)
-        fname_value = '/tmp/nbpymd-cache-{}-value.dill'.format(hash)
+        fname_session = '/tmp/pynb-cache-{}-session.dill'.format(hash)
+        fname_value = '/tmp/pynb-cache-{}-value.dill'.format(hash)
         cell_snippet = str(" ".join(cell.source.split())).strip()[:40]
 
         if self.disable_cache:

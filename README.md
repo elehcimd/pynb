@@ -1,6 +1,6 @@
 # Notebooks as Python with embedded Markdown
 
-`nbpymd` lets you manage Jupyter notebooks as plain Python code with Markdown text embedded into comments.
+`pynb` lets you manage Jupyter notebooks as plain Python code with Markdown text embedded into comments.
 
 , enabling:
 
@@ -14,10 +14,10 @@
 
 ## Installation
 
-`nbpymd` is compatible with `Python >= 3.4`. To install nbpymd on your system:
+`pynb` is compatible with `Python >= 3.4`. To install pynb on your system:
 
 ```
-pip install nbpymd
+pip install pynb
 ```
 
 ## Notebook Python synthax
@@ -50,11 +50,11 @@ The names of the function parameters are mapped to command line arguments. In th
 
 Lines whose content is either `'''` or `''''''` have a special meaning: Markdown text is delimited by `'''` and `''''''` serves as cell separator. Markdown text delimiters serve also as cell separators. An empty Markdown cell `'''\n'''` is equivalent to `''''''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away.
 
-A Python module can contain several Python functions defining multiple noetbooks. You can find some examples in the [notebooks](https://github.com/minodes/nbpymd/tree/master/notebooks) directory.
+A Python module can contain several Python functions defining multiple noetbooks. You can find some examples in the [notebooks](https://github.com/minodes/pynb/tree/master/notebooks) directory.
 
 ## Usage
 
-`nbpymd` can be used in two ways: as a command line tool (`nbapp`) and as a package class (`nbpymd.Notebook`). The command line tool `nbapp` is tailored for simplicity and is the fastest way to write & run a notebook. The `nbpymd.Notebook` class provides a finer control on parametrization and execution.
+`pynb` can be used in two ways: as a command line tool (`nbapp`) and as a package class (`pynb.Notebook`). The command line tool `nbapp` is tailored for simplicity and is the fastest way to write & run a notebook. The `pynb.Notebook` class provides a finer control on parametrization and execution.
 
 ### Method 1: The `nbapp` command line tool
 
@@ -92,7 +92,7 @@ Cache hits speed up significantly the notebook execution. Cache misses result in
 The caching system is enabled by default.
 The option `--disable-cache` disables the cache.
 You can ignore the existing cache with option `--ignore-cache`.
-To clean the cache, remove the files manually with `rm /tmp/nbpymd-cache-*`.
+To clean the cache, remove the files manually with `rm /tmp/pynb-cache-*`.
 
 ### Method 2: The `Notebook` class interface
 
@@ -102,7 +102,7 @@ Example:
 ```
 # Contents of sumapp.py
 
-from nbpymd.notebook import Notebook
+from pynb.notebook import Notebook
 
 
 class SumNotebook(Notebook):
@@ -146,7 +146,7 @@ All command line options available from `nbapp` are also available with the clas
 
 Thank You to [Minodes](http://www.minodes.com) for supporting this Open Source project.
 
-The nbpymd project is released under the MIT license. Please see [LICENSE.txt](https://github.com/minodes/nbpymd/blob/master/LICENSE.txt).
+The pynb project is released under the MIT license. Please see [LICENSE.txt](https://github.com/minodes/pynb/blob/master/LICENSE.txt).
 
 ## Known issues
 

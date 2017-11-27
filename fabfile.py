@@ -12,7 +12,7 @@ def docker_exec(cmdline):
     Execute command in running docker container
     :param cmdline: command to be executed
     """
-    local('docker exec -ti nbpymd {}'.format(cmdline))
+    local('docker exec -ti pynb {}'.format(cmdline))
 
 
 def inc_version():
@@ -28,7 +28,7 @@ def inc_version():
 
     with open('version.py', 'w') as f:
         f.write('__version__ = "{}.{}.{}"\n'.format(values[0], values[1], values[2]))
-    with open('nbpymd/version.py', 'w') as f:
+    with open('pynb/version.py', 'w') as f:
         f.write('__version__ = "{}.{}.{}"\n'.format(values[0], values[1], values[2]))
 
     importlib.reload(version)
@@ -41,7 +41,7 @@ def docker_build(options=''):
     """
     Build docker image
     """
-    local('docker build {} -t nbpymd .'.format(options))
+    local('docker build {} -t pynb .'.format(options))
 
 
 @task
@@ -50,7 +50,7 @@ def docker_start(develop=True):
     Start docker container
     """
     curr_dir = os.path.dirname(os.path.realpath(__file__))
-    local('docker run --rm --name nbpymd -d -ti -p 127.0.0.1:8889:8888  -v {}:/code -t nbpymd'.format(curr_dir))
+    local('docker run --rm --name pynb -d -ti -p 127.0.0.1:8889:8888  -v {}:/code -t pynb'.format(curr_dir))
 
     if develop:
         # Install package in develop mode: the code in /code is mapped to the installed package.
@@ -64,7 +64,7 @@ def docker_stop():
     """
     Stop docker container
     """
-    local('docker stop nbpymd || true')
+    local('docker stop pynb || true')
 
 
 @task
@@ -89,7 +89,7 @@ def test_pip(cleancontainer=True):
         docker_start(develop=False)
     # WE have now a fresh container as defined in Dockerfile
 
-    docker_exec('pip install nbpymd')
+    docker_exec('pip install pynb')
     test()
 
     # restart with develop package install
@@ -155,7 +155,7 @@ def release():
     test()
     build()
 
-    pathname = 'dist/nbpymd-{}.tar.gz'.format(version.__version__)
+    pathname = 'dist/pynb-{}.tar.gz'.format(version.__version__)
 
     docker_exec('twine upload -u {user} -p {pass} {pathname}'.format(pathname=pathname, **pypi_auth))
 
@@ -167,4 +167,4 @@ def clean():
     """
     Rempove temporary files
     """
-    docker_exec('rm -rf .cache .eggs build dist')
+    local('rm -rf .cache .eggs build dist')

@@ -1,4 +1,4 @@
-# Environment for running, testing and releasing nbpymd.
+# Environment for running, testing and releasing pynb.
 
 # Start from Alpine + Python 3.6
 FROM frolvlad/alpine-python3
@@ -17,9 +17,6 @@ RUN pip install cffi
 
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
-
-# Install nbpymd
-#RUN pip install nbpymd --no-cache-dir --upgrade
 
 # Set default working directory
 WORKDIR /code

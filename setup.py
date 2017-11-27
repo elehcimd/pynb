@@ -6,13 +6,13 @@ with open('README.rst', encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='nbpymd',
+    name='pynb',
     version=__version__,
     author='Michele Dallachiesa',
     author_email='michele.dallachiesa@minodes.com',
-    packages=['nbpymd'],
+    packages=['pynb'],
     scripts=[],
-    url='https://github.com/minodes/nbpymd',
+    url='https://github.com/minodes/pynb',
     license='MIT',
     description='Manage Jupyter notebooks as Python code with embedded Markdown text.',
     long_description=long_description,
@@ -46,7 +46,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'nbapp = nbpymd.notebook:main',
+            'nbapp = pynb.notebook:main',
         ]
     },
 )
