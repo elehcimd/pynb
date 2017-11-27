@@ -6,7 +6,7 @@
 
 * **Version control**: Track changes, review pull requests and merge conflicts as with regular Python code. The cell outputs are stored separately and don't interfere with versioning.
 
-* **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean state and cells are evaluated again only in presence of code modifications.  
+* **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean session state and cells are evaluated again only in presence of code modifications thanks to the caching system.
 
 Furthermore, it also provides:
 
@@ -44,7 +44,7 @@ def cells(a, b):
     a + b
 ```
 
-Function parameters are mapped to notebook arguments and are injected as an additional cell at runtime. Lines whose content is `'''` serve as cell separators. Markdown cells are embedded in multi-line string blocks surrounded by `'''`. Consecutive Python cells are separated by `'''\n'''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away. A Python module can contain several Python functions defining multiple noetbooks. You can find some examples in the [notebooks](https://github.com/minodes/pynb/tree/master/notebooks) directory.
+Function parameters are mapped to notebook arguments and are injected as an additional cell at runtime. Lines whose content is `'''` serve as cell separators. Markdown cells are embedded in multi-line string blocks surrounded by `'''`. Consecutive Python cells are separated by `'''\n'''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away. A Python module can contain several functions defining multiple noetbooks. You can find some examples in the [notebooks](https://github.com/minodes/pynb/tree/master/notebooks) directory.
 
 ## Usage
 
@@ -59,26 +59,16 @@ Parameters are passed from the command line with `--param` options, whose value 
 
 The default name of the function defining the notebook is `cells`. A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`.
 
-The options `--export-html` and `--export-ipynb` let you export to `.html` and `.ipynb` file formats, respectively. The special output pathname `-` points to standard output. If you only want to convert the notebook without executing it, you can skip the execution with the `--no-exec` option.
-
-### Execution cache
-
-The caching system allows you to reuse transparently the Python sessions and outputs of previous notebook executions. Each cell is associated to a hash generated from these fields:
-
-* **id**: Unique identifier of the notebook. It is either the notebook module name or the class name. An additional id can be appended with the command line parameter `--append-id`.
-
-* **kwargs**: Notebook parameters
-
-* **cell**: Cell content
-
-* **index**: Cell position
-
-Cache hits speed up significantly the notebook execution. Cache misses result in the invalidation of the cache. The cache is maintained in temporary files.
-
 The caching system is enabled by default.
 The option `--disable-cache` disables the cache.
-You can ignore the existing cache with option `--ignore-cache`.
-To clean the cache, remove the files manually with `rm /tmp/pynb-cache-*`.
+You can ignore the existing cache with option `--ignore-cache` to force a complete new execution.
+To clean the cache, remove the files `/tmp/pynb-cache-*`.
+
+The caching system allows you to reuse transparently prior cell executions. The hash of each cell is generated using this information: full pathname of the file containing the notebook definition, notebook parameters, cells content and position.
+Cache hits speed up significantly the notebook execution. Cache misses result in the invalidation of the cache. The cache is maintained in temporary files: `/tmp/pynb-cache-*` .
+The options `--export-html` and `--export-ipynb` let you export to `.html` and `.ipynb` file formats, respectively.
+The special output pathname `-` points to standard output.
+If you only want to convert the notebook without executing it, you can skip its execution with the `--no-exec` option.
 
 
 ## Class interface
@@ -115,19 +105,10 @@ To run it:
 python3 notebooks/sumapp.py --b 3 --print-ipynb
 ```
 
-Class `SumNotebook` extends `Notebook` and defines the notebook in method `cells`.
-
-Method `Notebook.add_argument` maps to [ArgumentParser.add_argument](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.add_argument) and lets you define additional notebook parameters or custom options.
-
-Method `Notebook.run` takes care of executing the notebook taking into account the command line arguments.
-
-After running the notebook, the attribute `nb.args` contains the object returned by [ArgumentParser.parse_args](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args) and can be used to handle additional user-defined options. E.g., `--print-ipynb`. If you want to handle user-defined parameters before calling `nb.run()`, you can call `nb.parse_args()` to initialize explicitly `nb.args`.
+Class `SumNotebook` extends `Notebook` and defines the notebook in method `cells`. Method `Notebook.add_argument` maps to [ArgumentParser.add_argument](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.add_argument) and lets you define additional notebook parameters or custom options. Method `Notebook.run` takes care of executing the notebook taking into account the command line arguments. After running the notebook, the attribute `nb.args` contains the object returned by [ArgumentParser.parse_args](https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser.parse_args) and can be used to handle additional user-defined options. E.g., `--print-ipynb`. If you want to handle user-defined parameters before calling `nb.run()`, you can call `nb.parse_args()` to initialize explicitly `nb.args`.
 
 There must be an exact match between the parameter names of the `cells` function and `argparse` attribute names.
-
-All notebook parameter values that have no default value must be provided from the command line. E.g., parameter `b` in the example above.
-
-All command line options available from the `pynb` command line tool are also available with the class interface.
+All notebook parameter values that have no default value must be provided from the command line. E.g., parameter `b` in the example above. All command line options available from the `pynb` command line tool are also available with the class interface.
 
 ## Credits and license
 

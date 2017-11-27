@@ -415,6 +415,8 @@ class Notebook:
         except:
             fatal("Function '{}' not found in '{}' or synthax issues".format(func_name, pathname))
 
+        return pathname, func_name
+
     def parse_args(self, **kwargs):
         """
         Parse arguments
@@ -437,8 +439,6 @@ class Notebook:
                                  help='Enable debug logging')
 
         self.parser.add_argument('--param', action='append', help='Cells param. Format: name=value')
-
-        self.parser.add_argument('--append-id', default='', help='Notebook unique id')
 
         self.add_argument('--export-html', help='Pathname to export to HTML format')
         self.add_argument('--export-ipynb', help='Pathname to export to Jupyter notebook format')
@@ -493,9 +493,9 @@ class Notebook:
 
         if self.args.cells:
             # module and function name passed with args.cells parameter
-            self.set_cells(self.args.cells)
+            pathname, func_name = self.set_cells(self.args.cells)
             logging.info('Running cells from {}'.format(self.args.cells))
-            uid = self.args.cells
+            uid = '{}:{}'.format(os.path.abspath(pathname), func_name)
             self.cells_name = self.args.cells
         else:
             # Notebook class extended, .cells method contains the target cell
@@ -503,10 +503,7 @@ class Notebook:
             if self.__class__ == Notebook:
                 fatal('Notebook class not extended and cells parameter is missing')
             logging.info('Running notebook {}'.format(self.__class__.__name__))
-            uid = self.__class__.__name__
-
-        if self.args.append_id:
-            uid += ':' + self.args.append_id
+            uid = '{}:{}'.format(os.path.abspath(inspect.getfile(self.__class__)), self.__class__.__name__)
 
         logging.info("Unique id: '{}'".format(uid))
         logging.info('Disable cache: {}'.format(self.args.disable_cache))
