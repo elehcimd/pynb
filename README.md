@@ -1,12 +1,12 @@
 # Notebooks as plain Python with embedded Markdown
 
-`pynb` builds on top of [nbconvert](https://github.com/jupyter/nbconvert) and lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling: 
+`pynb` builds on top of [nbconvert](https://github.com/jupyter/nbconvert) and lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling:
 
-* **Software engineering**: Use your preferred Python IDE/editor, ensure code style compliance, navigate, refactor, and test your code.
+* **Python development environment**: Use your preferred IDE/editor, ensure style compliance, navigate, refactor, and test your notebooks as regular Python code.
 
 * **Version control**: Track changes, review pull requests and merge conflicts as with regular Python code. The cell outputs are stored separately and don't interfere with versioning.
 
-* **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean iPython kernel and the execution of cells is cached.
+* **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean iPython kernel state and the execution is cached.
 
 You also get parametrized batch and programmatic notebook execution.
 
