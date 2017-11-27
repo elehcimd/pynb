@@ -18,7 +18,7 @@ You also get parametrized batch and programmatic notebook execution.
 pip install pynb
 ```
 
-## Notebook format
+## The `pynb` notebook format
 
 A `pynb` notebook is a Python function that represents a sequence of cells whose type is either Python or Markdown:
 
