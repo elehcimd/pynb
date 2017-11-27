@@ -46,7 +46,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'nbapp = pynb.notebook:main',
+            'pynb = pynb.notebook:main',
         ]
     },
 )
