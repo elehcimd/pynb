@@ -1,16 +1,19 @@
-# Notebooks as Python with embedded Markdown
+# Notebooks as plain Python with embedded Markdown
 
-`pynb` lets you manage Jupyter notebooks as plain Python code with Markdown text embedded into comments.
+`pynb` lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling:
 
-, enabling:
+* **Software engineering**: Use your preferred Python IDE/editor with code autocompletion, ensure code style compliance, navigate, refactor, and test your code.
 
-* **Version control**: Review pull requests and version your notebooks as regular Python code.
+* **Version control**: Track changes, review pull requests and merge conflicts as with regular Python code. The cell outputs are stored separately and don't interfere with versioning.
 
-* **Python Programming environment**: Use your preferred Python IDE/editor, ensure PEP8 style compliance, navigate, refactor and test your code.
+* **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean state and cells are evaluated again only in presence of code modifications.  
 
-* **Parametrized, programmatic and batch execution**: Execute your notebooks from command line as standalone tasks, mapping parameters to arguments. 
+Furthermore, it also provides:
 
-* **Smart execution cache**: Cache the cell results and their iPython session state, and build notebooks incrementally.
+* **Parametrized notebooks**: Passing parameters to your notebooks is as easy as adding parameters to a Python function.
+ 
+* **Batch and programmatic execution**: Run your notebooks from command line and from the class interface.
+
 
 ## Installation
 
@@ -21,6 +24,24 @@ pip install pynb
 ```
 
 ## Notebook Python synthax
+
+
+
+```
+def cells(a, b):
+    '''
+    # Sum and product    
+    '''
+
+    a+b
+
+    '''
+    '''
+
+    a*b    
+```
+
+
 
 A notebook is defined as a Python function with Markdown text embedded in multi-line string blocks. Notebooks can contain only Python and Markdown cells. Example:
 
