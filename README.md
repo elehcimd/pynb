@@ -6,8 +6,8 @@
 
 * **Version control**: Track changes, review pull requests and merge conflicts as with regular Python code. The cell outputs are stored separately and don't interfere with versioning.
 
-* **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean session state and cells execution is cached.
- 
+* **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean iPython kernel and the execution of cells is cached.
+
 You also get parametrized batch and programmatic notebook execution.
 
 ## Installation
