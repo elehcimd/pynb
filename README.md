@@ -7,14 +7,9 @@ def cells(a, b):
     '''
     # Sum and product
     '''
-    
     a+b
-    
     ''''''
-    
     a*b    
-    
-
 ```
 
 * **Version control**: Review pull requests and version your notebooks as regular Python code.
