@@ -179,7 +179,7 @@ fab test
 To run a single test:
 
 ```
-fab test:tests/test_pynb.py::test_pynb_cells
+fab test:tests/test_class.py::test_custom_nbapp
 ```
 
 To run tests printing output and stopping at first error:
