@@ -9,6 +9,7 @@
 * **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean iPython kernel and the execution of cells is cached.
 
 You also get parametrized batch and programmatic notebook execution.
+All this comes at a price: You lose interactivity.
 
 ## Installation
 
