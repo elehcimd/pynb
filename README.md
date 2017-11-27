@@ -57,17 +57,23 @@ To run the `sum.py` notebook reported above:
 pynb notebooks/sum.py --param a=3 --param b=5
 ```
 
+### Handling parameters and multiple notebooks in the same file
+
 Parameters are passed from the command line with `--param` options, whose value is formatted as `name=value`. Names are separated from values at the first occurrence of character `=`. Values are strings and might require casting to their proper type inside the notebook.
 
 The default name of the function defining the notebook is `cells`. A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`.
 
-The caching system is enabled by default.
-The option `--disable-cache` disables the cache.
-You can ignore the existing cache with option `--ignore-cache` to force a complete new execution.
-To clean the cache, remove the files `/tmp/pynb-cache-*`.
+### The execution cache
 
-The caching system allows you to reuse transparently prior cell executions. The hash of each cell is generated using this information: full pathname of the file containing the notebook definition, notebook parameters, cells content and position.
-Cache hits speed up significantly the notebook execution. Cache misses result in the invalidation of the cache. The cache is maintained in temporary files: `/tmp/pynb-cache-*` .
+The caching system allows you to reuse transparently prior cell executions and it's enabled by default.
+The option `--disable-cache` disables the cache.
+You can force a complete new notebook execution by ignoring the existing cache with option `--ignore-cache`.
+
+The hash of each cell is generated using this information: full pathname of the file containing the notebook definition, notebook parameters passed at runtime, cells content and position inside the notebook.
+Cache hits speed up significantly the notebook execution. Cache misses result in the invalidation of the cache. The cache is maintained in temporary files at `/tmp/pynb-cache-*` . To clean the cache, remove manually the files `/tmp/pynb-cache-*`.
+
+### Exporting to other formats 
+
 The options `--export-html` and `--export-ipynb` let you export to `.html` and `.ipynb` file formats, respectively.
 The special output pathname `-` points to standard output.
 If you only want to convert the notebook without executing it, you can skip its execution with the `--no-exec` option.
