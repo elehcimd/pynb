@@ -1,8 +1,6 @@
-# Notebooks as Python with embedded Markdown
+# Jupyter notebooks as plain Python with embedded Markdown
 
-`pynb` lets you manage Jupyter notebooks as plain Python code with Markdown text embedded into comments.
-
-, enabling:
+`pynb` lets you manage Jupyter notebooks as plain Python code with embedded Markdown text. 
 
 * **Version control**: Review pull requests and version your notebooks as regular Python code.
 
