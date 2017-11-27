@@ -229,16 +229,14 @@ class Notebook:
                             indent_count += 1
                 line = line[indent_count:]
 
-            if line.strip() == "'''" or line.strip() == "''''''":  # if md block begin/end, or new cell...
+            if line.strip() == "'''":  # if md block begin/end, or new cell...
                 if len(buffer.strip()) > 0:
                     if not inside_markdown:  # if md block begin: new markdown block! flush buffer
                         self.add_cell_code(buffer)
                     else:  # if md block end: markdown block completed! flush buffer
                         self.add_cell_markdown(buffer)
                 buffer = ""
-
-                if line.strip() == "'''":
-                    inside_markdown = not inside_markdown
+                inside_markdown = not inside_markdown
             else:
                 buffer += line
 

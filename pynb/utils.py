@@ -4,6 +4,7 @@ Utility functions
 
 import logging
 import sys
+from inspect import signature, Parameter
 
 
 def get_func(func_name, module_pathname):

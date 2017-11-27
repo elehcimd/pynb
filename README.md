@@ -1,6 +1,6 @@
 # Notebooks as plain Python with embedded Markdown
 
-`pynb` lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling:
+`pynb` builds on top of [nbconvert](https://github.com/jupyter/nbconvert) and lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling: 
 
 * **Software engineering**: Use your preferred Python IDE/editor with code autocompletion, ensure code style compliance, navigate, refactor, and test your code.
 
@@ -14,36 +14,17 @@ Furthermore, it also provides:
  
 * **Batch and programmatic execution**: Run your notebooks from command line and from the class interface.
 
-
 ## Installation
 
-`pynb` is compatible with `Python >= 3.4`. To install pynb on your system:
+`pynb` is compatible with `Python >= 3.4`. To install `pynb` on your system:
 
 ```
 pip install pynb
 ```
 
-## Notebook Python synthax
+## Notebook format
 
-
-
-```
-def cells(a, b):
-    '''
-    # Sum and product    
-    '''
-
-    a+b
-
-    '''
-    '''
-
-    a*b    
-```
-
-
-
-A notebook is defined as a Python function with Markdown text embedded in multi-line string blocks. Notebooks can contain only Python and Markdown cells. Example:
+A `pynb` notebook is a Python function that represents a sequence of cells whose type is either Python or Markdown:
 
 ```
 # Contents of sum.py
@@ -51,56 +32,40 @@ A notebook is defined as a Python function with Markdown text embedded in multi-
 
 def cells(a, b):
     '''
-    # Sum of two integers
+    # Sum
     '''
 
-    a, b = int(a), int(b)
-
-    ''''''
-
-    a, b
+    a = int(a)
+    b = int(b)
 
     '''
-    Sum:
     '''
 
     a + b
 ```
 
-The names of the function parameters are mapped to command line arguments. In the example above, we have two arguments `a` and `b`. This notebook is composed by five (5) cells: `[md, py, py, md, py]`. At runtime, the parameter values are injected into the notebook as an additional Python cell. If the first cell is a Markdown cell, the new parameters Python cell is injected after it.
-
-Lines whose content is either `'''` or `''''''` have a special meaning: Markdown text is delimited by `'''` and `''''''` serves as cell separator. Markdown text delimiters serve also as cell separators. An empty Markdown cell `'''\n'''` is equivalent to `''''''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away.
-
-A Python module can contain several Python functions defining multiple noetbooks. You can find some examples in the [notebooks](https://github.com/minodes/pynb/tree/master/notebooks) directory.
+Function parameters are mapped to notebook arguments and are injected as an additional cell at runtime. Lines whose content is `'''` serve as cell separators. Markdown cells are embedded in multi-line string blocks surrounded by `'''`. Consecutive Python cells are separated by `'''\n'''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away. A Python module can contain several Python functions defining multiple noetbooks. You can find some examples in the [notebooks](https://github.com/minodes/pynb/tree/master/notebooks) directory.
 
 ## Usage
 
-`pynb` can be used in two ways: as a command line tool (`nbapp`) and as a package class (`pynb.Notebook`). The command line tool `nbapp` is tailored for simplicity and is the fastest way to write & run a notebook. The `pynb.Notebook` class provides a finer control on parametrization and execution.
-
-### Method 1: The `nbapp` command line tool
-
-To run the notebook defined in `sum.py`:
+The `pynb` command line tool is tailored for simplicity and is the fastest way to write & run a notebook.
+To run the `sum.py` notebook reported above:
 
 ```
-nbapp sum.py --param a=3 --param b=5
+pynb notebooks/sum.py --param a=3 --param b=5
 ```
 
-Parameters are passed from the command line with `--param` options, whose value is formatted as `name=value`. Names are splitted from values at the first occurrence of `=`.
-Values are strings and might require casting to their proper type inside the notebook (E.g., `int`).
+Parameters are passed from the command line with `--param` options, whose value is formatted as `name=value`. Names are separated from values at the first occurrence of character `=`. Values are strings and might require casting to their proper type inside the notebook.
 
 The default name of the function defining the notebook is `cells`. A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`.
 
-If you only want to convert the notebook without executing it, you can skip the execution with the `--no-exec` option.
+The options `--export-html` and `--export-ipynb` let you export to `.html` and `.ipynb` file formats, respectively. The special output pathname `-` points to standard output. If you only want to convert the notebook without executing it, you can skip the execution with the `--no-exec` option.
 
-#### Exporting
-
-The options `--export-html` and `--export-ipynb` let you export to .html and .ipynb file formats, respectively. The special output pathname `-` points to standard output.
-
-## Execution cache
+### Execution cache
 
 The caching system allows you to reuse transparently the Python sessions and outputs of previous notebook executions. Each cell is associated to a hash generated from these fields:
 
-* **uid**: Unique identifier of the notebook. It is either the notebook module name or the class name. An additional id can be appended with the command line parameter `--append-id`.
+* **id**: Unique identifier of the notebook. It is either the notebook module name or the class name. An additional id can be appended with the command line parameter `--append-id`.
 
 * **kwargs**: Notebook parameters
 
@@ -115,10 +80,11 @@ The option `--disable-cache` disables the cache.
 You can ignore the existing cache with option `--ignore-cache`.
 To clean the cache, remove the files manually with `rm /tmp/pynb-cache-*`.
 
-### Method 2: The `Notebook` class interface
 
-To define a notebook, extend the `Notebook` class and define a `cells` method.
-Example:
+## Class interface
+
+The `pynb.Notebook` class interface provides a finer control on parametrization and execution.
+To define a notebook, extend the `Notebook` class and use it as in the example below:
 
 ```
 # Contents of sumapp.py
@@ -143,10 +109,10 @@ if __name__ == "__main__":
         nb.export_ipynb('-')
 ```
 
-To run `sumapp.py`:
+To run it:
 
 ```
-python3 sumapp.py --b 3 --print-ipynb
+python3 notebooks/sumapp.py --b 3 --print-ipynb
 ```
 
 Class `SumNotebook` extends `Notebook` and defines the notebook in method `cells`.
@@ -161,7 +127,7 @@ There must be an exact match between the parameter names of the `cells` function
 
 All notebook parameter values that have no default value must be provided from the command line. E.g., parameter `b` in the example above.
 
-All command line options available from `nbapp` are also available with the class interface.
+All command line options available from the `pynb` command line tool are also available with the class interface.
 
 ## Credits and license
 
@@ -190,7 +156,8 @@ Any changes to the package dependencies in `setup.py` must be reflected in `requ
 
 ### Jupyter server
 
-The Jupyter server is reachable at http://127.0.0.1:8889/tree.
+The Jupyter server is reachable at [http://127.0.0.1:8889/tree](http://127.0.0.1:8889/tree) and
+points to the `notebooks` directory.
 
 ### Building and publishing a new release
 
@@ -221,7 +188,7 @@ fab test
 To run a single test:
 
 ```
-fab test:tests/test_nbapp.py::test_nbapp_cells
+fab test:tests/test_pynb.py::test_pynb_cells
 ```
 
 To run tests printing output and stopping at first error:

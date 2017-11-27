@@ -1,19 +1,15 @@
-# Contents of sum.py
+# Contents of simple.py
 
 
 def cells(a, b):
     '''
-    # Sum of two integers
+    # Sum
     '''
 
-    a, b = int(a), int(b)
-
-    ''''''
-
-    a, b
+    a = int(a)
+    b = int(b)
 
     '''
-    Sum:
     '''
 
     a + b
