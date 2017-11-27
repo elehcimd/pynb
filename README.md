@@ -8,7 +8,7 @@
 
 * **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean session state and cells are evaluated again only in presence of code modifications thanks to the caching system.
 
-Furthermore, it also provides parametrized notebooks, batch and programmatic execution of notebooks.
+You also get parametrized batch and programmatic notebook execution.
 
 ## Installation
 
