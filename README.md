@@ -8,7 +8,8 @@ def cells(a, b):
     # Sum and product
     '''
     a+b
-    ''''''
+    '''
+    '''
     a*b    
 ```
 
