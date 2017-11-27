@@ -2,17 +2,13 @@
 
 `pynb` builds on top of [nbconvert](https://github.com/jupyter/nbconvert) and lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling: 
 
-* **Software engineering**: Use your preferred Python IDE/editor with code autocompletion, ensure code style compliance, navigate, refactor, and test your code.
+* **Software engineering**: Use your preferred Python IDE/editor with code autocompletion, ensure code style compliance, navigate, refactor, and test your notebooks.
 
 * **Version control**: Track changes, review pull requests and merge conflicts as with regular Python code. The cell outputs are stored separately and don't interfere with versioning.
 
 * **Consistent execution state**: Never lose track again of the execution state. Notebooks are always executed from a clean session state and cells are evaluated again only in presence of code modifications thanks to the caching system.
 
-Furthermore, it also provides:
-
-* **Parametrized notebooks**: Passing parameters to your notebooks is as easy as adding parameters to a Python function.
- 
-* **Batch and programmatic execution**: Run your notebooks from command line and from the class interface.
+Furthermore, it also provides parametrized notebooks, batch and programmatic execution of notebooks.
 
 ## Installation
 
