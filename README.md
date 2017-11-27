@@ -53,11 +53,11 @@ To run the `sum.py` notebook reported above:
 pynb notebooks/sum.py --param a=3 --param b=5
 ```
 
-### Handling notebook parameters
+### Notebook parameters
 
 Parameters are passed from the command line with `--param` options, whose value is formatted as `name=value`. Names are separated from values at the first occurrence of character `=`. Values are strings and might require casting to their proper type inside the notebook.
 
-### Handling custom notebook function names 
+### Custom notebook function name 
  
 The default name of the function defining the notebook is `cells`. A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`. A Python module can contain multiple notebook definitions.
 
