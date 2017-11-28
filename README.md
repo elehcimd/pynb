@@ -61,7 +61,13 @@ The default name of the function defining the notebook is `cells`. A different f
 ### Notebook parameters
 
 Parameters are passed from the command line with `--param` options, whose value is formatted as `name=value`. Names are separated from values at the first occurrence of character `=`. Values are strings and might require casting to their proper type inside the notebook.
- 
+
+### Exporting to other formats 
+
+The options `--export-html` and `--export-ipynb` let you export to `.html` and `.ipynb` file formats, respectively.
+The special output pathname `-` points to standard output.
+If you only want to convert the notebook without executing it, you can skip its execution using the `--no-exec` option.
+
 ### The cells execution cache
 
 The caching system allows you to reuse transparently prior cell executions and it's enabled by default.
@@ -72,12 +78,6 @@ To clean the cache, remove manually the files `/tmp/pynb-cache-*`.
 How does it work?
 An hash is generated for each cell by using the full pathname of the file containing the notebook definition, runtime notebook parameters, cell content and position. After executing a cell for the first time, its output and iPython kernel state are cached. Subsequent executions of the same cell use the cached cell state and speed up significantly the notebook execution.
 
-
-### Exporting to other formats 
-
-The options `--export-html` and `--export-ipynb` let you export to `.html` and `.ipynb` file formats, respectively.
-The special output pathname `-` points to standard output.
-If you only want to convert the notebook without executing it, you can skip its execution with the `--no-exec` option.
 
 
 ## Class interface
