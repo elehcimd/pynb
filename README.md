@@ -10,7 +10,6 @@
 
 You also get parametrized notebooks with batch and programmatic execution.
 
-
 ## Installation
 
 `pynb` is compatible with `Python >= 3.4` and can be installed with pip:
