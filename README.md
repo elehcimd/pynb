@@ -1,4 +1,4 @@
-# Notebooks as plain Python with embedded Markdown
+# Jupyter Notebooks as Python code with embedded Markdown
 
 `pynb` builds on top of [nbconvert](https://github.com/jupyter/nbconvert) and lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling:
 
