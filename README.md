@@ -56,7 +56,7 @@ To run the `sum.py:cells` notebook reported above:
 pynb notebooks/sum.py --param a=3 --param b=5
 ```
 
-The default name of the function defining the notebook is `cells`. A different function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`. A Python module can contain multiple notebook definitions by using different function names
+The default name of the function defining the notebook is `cells`. A different function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`. A Python module can contain multiple notebook definitions by using different function names.
 
 ### Notebook parameters
 
