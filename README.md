@@ -41,7 +41,7 @@ def cells(a, b):
     a + b
 ```
 
-The example above defines a notebook composed of three cells: [Markdown, Python, Python].
+The example above defines a notebook composed of three cells: *Markdown, Python, Python*.
 
 Function parameters are mapped to notebook arguments and are injected as an additional cell at runtime. Lines whose content is `'''` serve as cell separators. Markdown cells are embedded in multi-line string blocks surrounded by `'''`. Consecutive Python cells are separated by `'''\n'''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away.
 
@@ -50,20 +50,18 @@ A Python module can contain several functions defining multiple noetbooks. Examp
 ## Usage
 
 The `pynb` command line tool is tailored for simplicity and is the fastest way to write & run a `pynb` notebook.
-To run the `sum.py` notebook reported above:
+To run the `sum.py:cells` notebook reported above:
 
 ```
 pynb notebooks/sum.py --param a=3 --param b=5
 ```
 
+The default name of the function defining the notebook is `cells`. A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`. A Python module can contain multiple notebook definitions.
+
 ### Notebook parameters
 
 Parameters are passed from the command line with `--param` options, whose value is formatted as `name=value`. Names are separated from values at the first occurrence of character `=`. Values are strings and might require casting to their proper type inside the notebook.
-
-### Notebook function location 
  
-The default name of the function defining the notebook is `cells`. A different Python function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`. A Python module can contain multiple notebook definitions.
-
 ### The cells execution cache
 
 The caching system allows you to reuse transparently prior cell executions and it's enabled by default.
