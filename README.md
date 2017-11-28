@@ -67,9 +67,11 @@ Parameters are passed from the command line with `--param` options, whose value 
 The caching system allows you to reuse transparently prior cell executions and it's enabled by default.
 The option `--disable-cache` disables the cache.
 You can force a complete new notebook execution by ignoring the existing cache with option `--ignore-cache`.
+To clean the cache, remove manually the files `/tmp/pynb-cache-*`.
 
-The hash of each cell is generated using this information: full pathname of the file containing the notebook definition, notebook parameters passed at runtime, cells content and position inside the notebook.
-Cache hits speed up significantly the notebook execution. Cache misses result in the invalidation of the cache. The cache is maintained in temporary files at `/tmp/pynb-cache-*` . To clean the cache, remove manually the files `/tmp/pynb-cache-*`.
+How does it work?
+An hash is generated for each cell by using the full pathname of the file containing the notebook definition, runtime notebook parameters, cell content and position. After executing a cell for the first time, its output and iPython kernel state are cached. Subsequent executions of the same cell use the cached cell state and speed up significantly the notebook execution.
+
 
 ### Exporting to other formats 
 
