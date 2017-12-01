@@ -50,8 +50,22 @@ def test_pynb_export_ipynb(tmpdir):
     assert '12345' in output
 
 
-def test_pynb_export_html(tmpdir):
+def test_pynb_export_html():
     cmd = 'pynb {}:markdown --disable-cache --export-html -'
     output = local(cmd.format(os.path.realpath(__file__)), capture=True)
     assert '<html>' in output
     assert '>Title<' in output
+
+
+def test_export_pynb(tmpdir):
+    test_pynb_export_ipynb(tmpdir)
+    cmd = 'pynb --disable-cache --import-ipynb {}/test.ipynb --export-pynb - --no-exec'
+    output = local(cmd.format(tmpdir), capture=True)
+    assert 'def cells():' in output
+
+
+def test_no_double_footer(tmpdir):
+    test_pynb_export_ipynb(tmpdir)
+    cmd = 'pynb --disable-cache --import-ipynb {}/test.ipynb --export-ipynb - --debug'
+    output = local(cmd.format(tmpdir), capture=True)
+    assert 'Footer cell already present' in output.stderr

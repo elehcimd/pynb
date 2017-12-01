@@ -1,4 +1,4 @@
-pep8
+pycodestyle
 autopep8
 pytest
 setuptools

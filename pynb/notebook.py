@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 import time
+import traceback
 import warnings
 
 import dill
@@ -13,7 +14,7 @@ import nbformat as nbf
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
 
-from pynb.utils import get_func, fatal
+from pynb.utils import get_func, fatal, check_isfile
 from pynb.version import __version__
 
 logging.basicConfig(level=logging.INFO)
@@ -32,7 +33,6 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         self.prev_fname_session_loaded = None
         self.disable_cache = False
         self.ignore_cache = False
-        self.kwargs = {}
         self.uid = None
 
     def cell_hash(self, cell, cell_index):
@@ -42,10 +42,9 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         :param cell_index: cell index
         :return: hash string
         """
-        s = '{uid} {kwargs} {cell} {index}'.format(uid=self.uid,
-                                                   kwargs=str(self.kwargs),
-                                                   cell=str(cell.source),
-                                                   index=cell_index).encode('utf-8')
+        s = '{uid} {cell} {index}'.format(uid=self.uid,
+                                          cell=str(cell.source),
+                                          index=cell_index).encode('utf-8')
 
         hash = hashlib.sha1(s).hexdigest()[:8]
         return hash
@@ -182,11 +181,10 @@ class Notebook:
         Initialize notebook.
         """
 
-        description = 'nbapp v{} running {} on Python v{}.{}.{}'.format(__version__,
-                                                                        self.__class__.__name__,
-                                                                        *sys.version_info[:3])
+        self.long_name = 'pynb v{} running {} on Python v{}.{}.{}'.format(__version__, self.__class__.__name__,
+                                                                          *sys.version_info[:3])
 
-        self.parser = argparse.ArgumentParser(description=description)
+        self.parser = argparse.ArgumentParser(description=self.long_name)
         self.nb = nbf.v4.new_notebook()
         self.nb['cells'] = []
         self.cells_name = None
@@ -273,6 +271,17 @@ class Notebook:
         Add footer cell
         """
 
+        # check if there's already a cell footer... if true, do not add a second cell footer.
+        # this situation happens when exporting to ipynb and then importing from ipynb.
+
+        logging.info('Adding footer cell')
+
+        for cell in self.nb['cells']:
+            if cell.cell_type == 'markdown':
+                if 'pynb_footer_tag' in cell.source:
+                    logging.debug('Footer cell already present')
+                    return
+
         m = """
 
             ---
@@ -281,6 +290,7 @@ class Notebook:
             * **Execution time**: {exec_begin}
             * **Execution duration**: {exec_time:.2f}s
             * **Command line**: {argv}
+            [//]: # (pynb_footer_tag)
             """
         self.add_cell_markdown(
             m.format(exec_time=self.exec_time, exec_begin=self.exec_begin_dt, class_name=self.__class__.__name__,
@@ -317,7 +327,7 @@ class Notebook:
         else:
             self.nb['cells'].insert(pos, cell)
 
-    def process(self, uid, kwargs={}, no_exec=False, disable_cache=False, ignore_cache=False):
+    def process(self, uid, add_footer=False, no_exec=False, disable_cache=False, ignore_cache=False):
         """
         Execute notebook
         :return: self
@@ -326,17 +336,14 @@ class Notebook:
         self.exec_begin = time.perf_counter()
         self.exec_begin_dt = datetime.datetime.now()
 
-        self.add(self.cells, **kwargs)
-
         ep = CachedExecutePreprocessor(timeout=None, kernel_name='python3')
         ep.disable_cache = disable_cache
         ep.ignore_cache = ignore_cache
-        ep.kwargs = kwargs
         ep.uid = uid
 
         # Execute the notebook
 
-        if no_exec is False:
+        if not no_exec:
             with warnings.catch_warnings():
                 # On MacOS, annoying warning "RuntimeWarning: Failed to set sticky bit on"
                 # Let's suppress it.
@@ -347,7 +354,8 @@ class Notebook:
 
         self.add_cell_footer()
 
-        logging.info('Execution time: {0:.2f}s'.format(self.exec_time))
+        if not no_exec:
+            logging.info('Execution time: {0:.2f}s'.format(self.exec_time))
 
         return self
 
@@ -385,6 +393,34 @@ class Notebook:
 
         logging.info("HTML notebook exported to '{}'".format(pathname))
 
+    def export_pynb(self, pathname):
+
+        if pathname == '-':
+            f = sys.__stdout__
+        else:
+            f = open(pathname, 'w')
+
+        f.write('def cells():\n')
+
+        for cell in self.nb['cells']:
+            if cell.cell_type == 'markdown':
+                f.write("    '''\n")
+                for line in cell.source.splitlines():
+                    f.write('   {}\n'.format(line))
+                f.write("    '''\n")
+            elif cell.cell_type == 'code':
+                for line in cell.source.splitlines():
+                    f.write('    {}\n'.format(line))
+            else:
+                raise Exception('Unknown cell type: {}'.format(cell.cell_type))
+
+            f.write("\n    '''\n    '''\n\n")
+
+        if f is not sys.__stdout__:
+            f.close()
+
+        logging.info("Python notebook exported to '{}'".format(pathname))
+
     def add_argument(self, *args, **kwargs):
         """
         Add application argument
@@ -410,10 +446,13 @@ class Notebook:
             pathname = cells_location
             func_name = 'cells'
 
+        check_isfile(pathname)
+
         try:
             self.cells = get_func(func_name, pathname)
-        except:
-            fatal("Function '{}' not found in '{}' or synthax issues".format(func_name, pathname))
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            fatal("Function '{}' not found in '{}': {}".format(func_name, pathname, e.message))
 
         return pathname, func_name
 
@@ -424,24 +463,16 @@ class Notebook:
         :return:
         """
 
-        self.parser.add_argument('cells', help='Cells. Format: pathname.py[:cells_func]', nargs='?')
-
-        self.parser.add_argument('--disable-cache', action="store_true", default=False,
-                                 help='Disable execution cache')
-
-        self.parser.add_argument('--ignore-cache', action="store_true", default=False,
-                                 help='Ignore existing cache')
-
-        self.parser.add_argument('--no-exec', action="store_true", default=False,
-                                 help='Do not execute notebook')
-
-        self.parser.add_argument('--debug', action="store_true", default=False,
-                                 help='Enable debug logging')
-
-        self.parser.add_argument('--param', action='append', help='Cells param. Format: name=value')
-
-        self.add_argument('--export-html', help='Pathname to export to HTML format')
-        self.add_argument('--export-ipynb', help='Pathname to export to Jupyter notebook format')
+        self.parser.add_argument('cells', help='path to cells function. Format: PATHNAME.PY[:FUNCTION_NAME]', nargs='?')
+        self.parser.add_argument('--disable-cache', action="store_true", default=False, help='disable execution cache')
+        self.parser.add_argument('--ignore-cache', action="store_true", default=False, help='ignore existing cache')
+        self.parser.add_argument('--no-exec', action="store_true", default=False, help='do not execute notebook')
+        self.parser.add_argument('--debug', action="store_true", default=False, help='enable debug logging')
+        self.parser.add_argument('--param', action='append', help='notebook parameter. Format: NAME=VALUE')
+        self.add_argument('--import-ipynb', help='import from Jupyter notebook')
+        self.add_argument('--export-html', help='export to HTML format')
+        self.add_argument('--export-ipynb', help='export to Jupyter notebook')
+        self.add_argument('--export-pynb', help='export to Python notebook')
 
         if len(sys.argv) == 1 and self.__class__ == Notebook:
             # no parameters and Notebook class not extended:
@@ -451,6 +482,50 @@ class Notebook:
             sys.exit(1)
 
         self.args = self.parser.parse_args()
+
+    def load_cells_params(self):
+
+        if self.args.cells:
+            # module and function name passed with args.cells parameter
+            pathname, func_name = self.set_cells(self.args.cells)
+            logging.info('Loading cells from {}'.format(self.args.cells))
+            uid = '{}:{}'.format(os.path.abspath(pathname), func_name)
+            self.cells_name = self.args.cells
+        else:
+            # Notebook class extended, .cells method contains the target cell
+            # Let's make sure that this is the case...
+            if self.__class__ == Notebook:
+                fatal('Notebook class not extended and cells parameter is missing')
+            logging.info('Loading notebook {}'.format(self.__class__.__name__))
+            uid = '{}:{}'.format(os.path.abspath(inspect.getfile(self.__class__)), self.__class__.__name__)
+
+        # Process parameters passed by custom arguments
+        func_params = set(inspect.getargspec(self.cells).args)
+
+        self.kwargs = {}
+
+        if not self.args.cells:
+            # self is always present in case of subclassed Notebook, since cells(self, ...) is a method.
+            func_params.remove('self')
+            for param in func_params:
+                self.kwargs[param] = getattr(self.args, param, None)
+
+        # Process parameters passed with --param
+        if self.args.param:
+            for param in self.args.param:
+                k, v = param.split('=', 1)
+                self.kwargs[k] = v
+
+        # Check parameters completeness
+        for param in func_params:
+            if self.kwargs[param] is None:
+                fatal('Notebook parameter {} required but not found'.format(param))
+
+        logging.info('Parameters: {}'.format(self.kwargs))
+
+        self.add(self.cells, **self.kwargs)
+
+        return uid
 
     def run(self):
         """
@@ -462,56 +537,25 @@ class Notebook:
         if not self.args:
             self.parse_args()
 
+        logging.info(self.long_name)
+
         if self.args.debug:
-            logging.basicConfig(level=logging.DEBUG)
+            logging.getLogger().setLevel(logging.DEBUG)
+            logging.debug('Enabled DEBUG logging level')
 
-        # Process parameters passed by custom arguments
-        kwargs = {}
-
-        func_params = set(inspect.getargspec(self.cells).args)
-
-        # ignore self, which is present when extending Notebook.
-        if 'self' in func_params:
-            func_params.remove('self')
-
-        for param in func_params:
-            kwargs[param] = getattr(self.args, param, None)
-            if kwargs[param] is None:
-                fatal('Notebook parameter {} required but not found'.format(param))
-
-        # Process parameters passed with --param
-        if self.args.param:
-            for param in self.args.param:
-                k, v = param.split('=', 1)
-                kwargs[k] = v
-
-        self.kwargs = kwargs
-
-        logging.info('nbapp v{} running {} on Python v{}.{}.{}'.format(__version__,
-                                                                       self.__class__.__name__,
-                                                                       *sys.version_info[:3]))
-
-        if self.args.cells:
-            # module and function name passed with args.cells parameter
-            pathname, func_name = self.set_cells(self.args.cells)
-            logging.info('Running cells from {}'.format(self.args.cells))
-            uid = '{}:{}'.format(os.path.abspath(pathname), func_name)
-            self.cells_name = self.args.cells
+        if self.args.import_ipynb:
+            check_isfile(self.args.import_ipynb)
+            logging.info('Loading Jupyter notebook {}'.format(self.args.import_ipynb))
+            self.nb = nbf.read(self.args.import_ipynb, as_version=4)
+            uid = self.args.import_ipynb
         else:
-            # Notebook class extended, .cells method contains the target cell
-            # Let's make sure that this is the case...
-            if self.__class__ == Notebook:
-                fatal('Notebook class not extended and cells parameter is missing')
-            logging.info('Running notebook {}'.format(self.__class__.__name__))
-            uid = '{}:{}'.format(os.path.abspath(inspect.getfile(self.__class__)), self.__class__.__name__)
+            uid = self.load_cells_params()
 
-        logging.info("Unique id: '{}'".format(uid))
+        logging.debug("Unique id: '{}'".format(uid))
         logging.info('Disable cache: {}'.format(self.args.disable_cache))
         logging.info('Ignore cache: {}'.format(self.args.ignore_cache))
-        logging.info('Parameters: {}'.format(kwargs))
 
         self.process(uid=uid,
-                     kwargs=kwargs,
                      no_exec=self.args.no_exec,
                      disable_cache=self.args.disable_cache,
                      ignore_cache=self.args.ignore_cache)
@@ -522,10 +566,13 @@ class Notebook:
         if self.args.export_ipynb:
             self.export_ipynb(self.args.export_ipynb)
 
+        if self.args.export_pynb:
+            self.export_pynb(self.args.export_pynb)
+
 
 def main():
     """
-    Entry point for nbapp command
+    Entry point for pynb command
     :return:
     """
 

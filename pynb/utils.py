@@ -3,8 +3,8 @@ Utility functions
 """
 
 import logging
+import os
 import sys
-from inspect import signature, Parameter
 
 
 def get_func(func_name, module_pathname):
@@ -37,4 +37,10 @@ def fatal(msg):
     :return:
     """
     logging.fatal('{}; exiting.'.format(msg))
+    print()
     sys.exit(1)
+
+
+def check_isfile(pathname):
+    if not os.path.isfile(pathname):
+        fatal("File '{}' does not exist or not regular file".format(pathname))

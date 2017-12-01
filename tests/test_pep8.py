@@ -1,6 +1,6 @@
 import os
 
-from pep8 import StyleGuide
+from pycodestyle import StyleGuide
 
 
 def test_pep8():
