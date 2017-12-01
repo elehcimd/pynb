@@ -61,6 +61,17 @@ The default name of the function defining the notebook is `cells`. A different f
 
 Parameters are passed from the command line with `--param` options, whose value is formatted as `name=value`. Names are separated from values at the first occurrence of character `=`. Values are strings and might require casting to their proper type inside the notebook.
 
+
+### Importing from Jupyter notebooks 
+
+You can import a Jupyter notebook and export it as Python notebook as follows:
+
+```
+pynb --import-ipynb src.ipynb --export-pynb dst.py --no-exec
+```
+
+### The cells executio
+
 ### Exporting to other formats 
 
 The options `--export-html` and `--export-ipynb` let you export to `.html` and `.ipynb` file formats, respectively.
@@ -131,6 +142,13 @@ The pynb project is released under the MIT license. Please see [LICENSE.txt](htt
 ## Known issues
 
 On MacOS, ignore these warning messages `RuntimeWarning: Failed to set sticky bit on`. It's a known [bug](https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710).
+
+In case of errors, try to update the used packages:
+
+``` 
+pip install pynb --upgrade --no-cache
+```
+
 
 ## Development
 

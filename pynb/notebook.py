@@ -406,7 +406,7 @@ class Notebook:
             if cell.cell_type == 'markdown':
                 f.write("    '''\n")
                 for line in cell.source.splitlines():
-                    f.write('   {}\n'.format(line))
+                    f.write('    {}\n'.format(line))
                 f.write("    '''\n")
             elif cell.cell_type == 'code':
                 for line in cell.source.splitlines():
@@ -554,6 +554,9 @@ class Notebook:
         logging.debug("Unique id: '{}'".format(uid))
         logging.info('Disable cache: {}'.format(self.args.disable_cache))
         logging.info('Ignore cache: {}'.format(self.args.ignore_cache))
+
+        if self.args.export_pynb and not self.args.no_exec:
+            fatal('--export-pynb requires --no-exec')
 
         self.process(uid=uid,
                      no_exec=self.args.no_exec,
