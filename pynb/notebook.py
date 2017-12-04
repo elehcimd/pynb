@@ -452,7 +452,7 @@ class Notebook:
             self.cells = get_func(func_name, pathname)
         except Exception as e:
             logging.error(traceback.format_exc())
-            fatal("Function '{}' not found in '{}': {}".format(func_name, pathname, e)
+            fatal("Function '{}' not found in '{}': {}".format(func_name, pathname, e))
 
         return pathname, func_name
 
