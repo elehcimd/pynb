@@ -94,7 +94,7 @@ How to fix serialization failures:
 
 * Second, fix the code:
 
-  * Move the problematic variables inside a [with statement](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement). In general, the `with` statement ensures a clean & lean iPython's kernel state.
+  * Move the problematic variables inside a [with statement](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement). In general, the `with` statement ensures a clean & lean iPython kernel state.
 
   * Delete the problematic variables with the [del](https://docs.python.org/3/reference/simple_stmts.html#del) statement.
 
