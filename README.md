@@ -90,19 +90,19 @@ The iPython session is dumped using the [dill](https://github.com/uqfoundation/d
 
 How to fix serialization failures:
 
-First, enable the `--debug` option to print the stack trace of the serialization error (multi-line and coloured). The stack trace will provide hints on which variables are causing the problem.
+* First, enable the `--debug` option to print the stack trace of the serialization error (multi-line and coloured). The stack trace will provide hints on which variables are causing the problem.
 
-Second, fix the code:
+* Second, fix the code:
 
-* Move the problematic variables inside a [with statement](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement). In general, the `with` statement ensures a clean & lean iPython's kernel state.
+  * Move the problematic variables inside a [with statement](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement). In general, the `with` statement ensures a clean & lean iPython's kernel state.
 
-* Delete the problematic variables with the [del](https://docs.python.org/3/reference/simple_stmts.html#del) statement.
+  * Delete the problematic variables with the [del](https://docs.python.org/3/reference/simple_stmts.html#del) statement.
 
-* Reset the iPython session resolving any serialization issue with the iPython's [reset](http://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-reset) built-in magic command:
+  * Reset the iPython session resolving any serialization issue with the iPython's [reset](http://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-reset) built-in magic command:
 
-  ``` 
-  get_ipython().magic('reset -f')
-  ```
+    ``` 
+    get_ipython().magic('reset -f')
+    ```
   
 ## Class interface
 
