@@ -70,8 +70,6 @@ You can import a Jupyter notebook and export it as Python notebook as follows:
 pynb --import-ipynb src.ipynb --export-pynb dst.py --no-exec
 ```
 
-### The cells executio
-
 ### Exporting to other formats 
 
 The options `--export-html` and `--export-ipynb` let you export to `.html` and `.ipynb` file formats, respectively.
@@ -88,8 +86,24 @@ To clean the cache, remove manually the files `/tmp/pynb-cache-*`.
 How does it work?
 An hash is generated for each cell by using the full pathname of the file containing the notebook definition, runtime notebook parameters, cell content and position. After executing a cell for the first time, its output and iPython kernel state are cached. Subsequent executions of the same cell use the cached cell state and speed up significantly the notebook execution.
 
+The iPython session is dumped using the [dill](https://github.com/uqfoundation/dill) package. It is not always possible to serialize objects. E.g., a variable representing an open file cannot be serialized. Other notable cases are database connections and iterators. In such situations, a warning `serialization failed` is reported and the cache is disabled for the current and subsequent cells. Serialization issues do not affect the outputs of the notebook execution.
 
+How to fix serialization failures:
 
+First, enable the `--debug` option to print the stack trace of the serialization error (multi-line and coloured). The stack trace will provide hints on which variables are causing the problem.
+
+Second, fix the code:
+
+* Move the problematic variables inside a [with statement](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement). In general, the `with` statement ensures a clean & lean iPython's kernel state.
+
+* Delete the problematic variables with the [del](https://docs.python.org/3/reference/simple_stmts.html#del) statement.
+
+* Reset the iPython session resolving any serialization issue with the iPython's [reset](http://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-reset) built-in magic command:
+
+  ``` 
+  get_ipython().magic('reset -f')
+  ```
+  
 ## Class interface
 
 The `pynb.Notebook` class interface provides a finer control on parametrization and execution.

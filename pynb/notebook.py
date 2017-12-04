@@ -13,6 +13,7 @@ import dill
 import nbformat as nbf
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
+from nbconvert.preprocessors.execute import CellExecutionError
 
 from pynb.utils import get_func, fatal, check_isfile
 from pynb.version import __version__
@@ -99,7 +100,7 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         # value[0]['content']['execution_count'] = cell_index
 
         # 3) Cache cell session
-        cached = self.session_dump(hash, fname_session)
+        cached = self.session_dump(cell, hash, fname_session)
 
         # 4) Cache cell value, if no errors while dumping the cell session in 3).
 
@@ -136,7 +137,7 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         inject_cell = nbf.v4.new_code_cell('\n'.join(inject_code))
         super().run_cell(inject_cell)
 
-    def session_dump(self, hash, fname_session):
+    def session_dump(self, cell, hash, fname_session):
         """
         Dump ipython session to file
         :param hash: cell hash
@@ -153,9 +154,10 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         inject_cell = nbf.v4.new_code_cell('\n'.join(inject_code))
         reply, outputs = super().run_cell(inject_cell)
 
-        errors = len(list(filter(lambda out: out.output_type == 'error', outputs)))
-        if errors:
+        errors = list(filter(lambda out: out.output_type == 'error', outputs))
+        if len(errors):
             logging.info('Cell {}: Warning: serialization failed, cache disabled'.format(hash))
+            logging.debug('Cell {}: Serialization error: {}'.format(hash, CellExecutionError.from_cell_and_msg(cell, errors[0])))
 
             # disable attempts to retrieve cache for subsequent cells
             self.disable_cache = True
