@@ -157,7 +157,7 @@ The pynb project is released under the MIT license. Please see [LICENSE.txt](htt
 
 On MacOS, ignore these warning messages `RuntimeWarning: Failed to set sticky bit on`. It's a known [bug](https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710).
 
-In case of errors, try to update the used packages:
+In case of errors, try to update the involved packages:
 
 ``` 
 pip install pynb --upgrade --no-cache
