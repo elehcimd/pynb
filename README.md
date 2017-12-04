@@ -76,7 +76,7 @@ The options `--export-html` and `--export-ipynb` let you export to `.html` and `
 The special output pathname `-` points to standard output.
 If you only want to convert the notebook without executing it, you can skip its execution using the `--no-exec` option.
 
-### The cells execution cache
+### Execution cache
 
 The caching system allows you to reuse transparently prior cell executions and it's enabled by default.
 The option `--disable-cache` disables the cache.
