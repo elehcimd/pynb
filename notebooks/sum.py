@@ -1,4 +1,4 @@
-# Contents of simple.py
+# Contents of sum.py
 
 
 def cells(a, b):
