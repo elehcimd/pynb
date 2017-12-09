@@ -149,7 +149,7 @@ All command line options available from the `pynb` command line tool are also av
 
 ## Credits and license
 
-Thank You to [Minodes](http://www.minodes.com) for supporting this Open Source project.
+[Minodes](http://www.minodes.com) supports this and other Open Source projects.
 
 The pynb project is released under the MIT license. Please see [LICENSE.txt](https://github.com/minodes/pynb/blob/master/LICENSE.txt).
 
