@@ -44,6 +44,8 @@ The example above defines a notebook composed of three cells: *Markdown, Python,
 
 Function parameters are mapped to notebook arguments and are injected as an additional cell at runtime. Lines whose content is `'''` serve as cell separators. Markdown cells are embedded in multi-line string blocks surrounded by `'''`. Consecutive Python cells are separated by `'''\n'''`. Empty cells are ignored and trailing spaces or empty lines within cells are stripped away.
 
+The Python statement `return` has a special meaning and it instructs the parser to ignore the remaining content of the notebook.
+
 A Python module can contain several functions defining multiple noetbooks. Examples can be found [notebooks](https://github.com/minodes/pynb/tree/master/notebooks) directory.
 
 ## Usage

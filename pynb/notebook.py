@@ -215,6 +215,7 @@ class Notebook:
         buffer = ""
         indent_count = None
         inside_markdown = False
+        return_found = False
 
         for line in lines:
 
@@ -228,6 +229,10 @@ class Notebook:
                         else:
                             indent_count += 1
                 line = line[indent_count:]
+
+            if not inside_markdown and line.strip() == "return":
+                logging.info('Encountered "return" statement, ignoring the rest of the notebook.')
+                break
 
             if line.strip() == "'''":  # if md block begin/end, or new cell...
                 if len(buffer.strip()) > 0:
@@ -432,7 +437,7 @@ class Notebook:
         """
         self.parser.add_argument(*args, **kwargs)
 
-    def cells(self):
+    def cells(self, *args, **kwargs):
         pass
 
     def set_cells(self, cells_location):

@@ -1,9 +1,6 @@
-"""
-Examples of cells for notebook definition.
-"""
-
-
 def cells():
+    from sums import inc
+    inc(100)
     int(10000 + 2345)
 
 

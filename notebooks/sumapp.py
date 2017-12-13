@@ -1,5 +1,3 @@
-# Contents of sumapp.py
-
 from pynb.notebook import Notebook
 
 
