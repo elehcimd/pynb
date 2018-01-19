@@ -82,7 +82,7 @@ The options `--export-html` and `--export-ipynb` let you export to `.html` and `
 The special output pathname `-` points to standard output.
 If you only want to convert the notebook without executing it, you can skip its execution using the `--no-exec` option.
 
-### The cells execution cache
+### Execution cache
 
 The caching system allows you to reuse transparently prior cell executions and it's enabled by default.
 The option `--disable-cache` disables the cache.
@@ -155,7 +155,7 @@ All command line options available from the `pynb` command line tool are also av
 
 ## Credits and license
 
-Thank You to [Minodes](http://www.minodes.com) for supporting this Open Source project.
+[Minodes](http://www.minodes.com) supports this and other Open Source projects.
 
 The pynb project is released under the MIT license. Please see [LICENSE.txt](https://github.com/minodes/pynb/blob/master/LICENSE.txt).
 
@@ -163,7 +163,7 @@ The pynb project is released under the MIT license. Please see [LICENSE.txt](htt
 
 On MacOS, ignore these warning messages `RuntimeWarning: Failed to set sticky bit on`. It's a known [bug](https://github.com/jupyter/jupyter_client/pull/201#issuecomment-314269710).
 
-In case of errors, try to update the used packages:
+In case of errors, try to update the involved packages:
 
 ``` 
 pip install pynb --upgrade --no-cache
