@@ -64,12 +64,12 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         cell_snippet = str(" ".join(cell.source.split())).strip()[:40]
 
         if self.disable_cache:
-            logging.info('Cell {}: Running: "{}"'.format(hash, cell_snippet))
+            logging.info('Cell {}: Running: "{}.."'.format(hash, cell_snippet))
             return super().run_cell(cell, cell_index)
 
         if not self.ignore_cache:
             if self.cache_valid and os.path.isfile(fname_session) and os.path.isfile(fname_value):
-                logging.info('Cell {}: Loading: "{}"'.format(hash, cell_snippet))
+                logging.info('Cell {}: Loading: "{}.."'.format(hash, cell_snippet))
                 self.prev_fname_session = fname_session
                 with open(fname_value, 'rb') as f:
                     value = dill.load(f)
@@ -83,7 +83,7 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         # 4) Cache cell session
         # 5) Cache cell value
 
-        logging.info('Cell {}: Running: "{}"'.format(hash, cell_snippet))
+        logging.info('Cell {}: Running: "{}.."'.format(hash, cell_snippet))
 
         # 1) Invalidate subsequent cell caches
         self.cache_valid = False
@@ -157,7 +157,8 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         errors = list(filter(lambda out: out.output_type == 'error', outputs))
         if len(errors):
             logging.info('Cell {}: Warning: serialization failed, cache disabled'.format(hash))
-            logging.debug('Cell {}: Serialization error: {}'.format(hash, CellExecutionError.from_cell_and_msg(cell, errors[0])))
+            logging.debug(
+                'Cell {}: Serialization error: {}'.format(hash, CellExecutionError.from_cell_and_msg(cell, errors[0])))
 
             # disable attempts to retrieve cache for subsequent cells
             self.disable_cache = True
@@ -359,7 +360,8 @@ class Notebook:
 
         self.exec_time = time.perf_counter() - self.exec_begin
 
-        self.add_cell_footer()
+        if add_footer:
+            self.add_cell_footer()
 
         if not no_exec:
             logging.info('Execution time: {0:.2f}s'.format(self.exec_time))
@@ -474,12 +476,14 @@ class Notebook:
         self.parser.add_argument('--disable-cache', action="store_true", default=False, help='disable execution cache')
         self.parser.add_argument('--ignore-cache', action="store_true", default=False, help='ignore existing cache')
         self.parser.add_argument('--no-exec', action="store_true", default=False, help='do not execute notebook')
-        self.parser.add_argument('--debug', action="store_true", default=False, help='enable debug logging')
         self.parser.add_argument('--param', action='append', help='notebook parameter. Format: NAME=VALUE')
         self.add_argument('--import-ipynb', help='import from Jupyter notebook')
         self.add_argument('--export-html', help='export to HTML format')
         self.add_argument('--export-ipynb', help='export to Jupyter notebook')
         self.add_argument('--export-pynb', help='export to Python notebook')
+        self.add_argument('--log-level', help='set log level')
+        self.add_argument('--disable-footer', action="store_true", default=False,
+                          help='do not append Markdown footer to Jupyter notebook')
 
         if len(sys.argv) == 1 and self.__class__ == Notebook:
             # no parameters and Notebook class not extended:
@@ -544,11 +548,9 @@ class Notebook:
         if not self.args:
             self.parse_args()
 
-        logging.info(self.long_name)
-
-        if self.args.debug:
-            logging.getLogger().setLevel(logging.DEBUG)
-            logging.debug('Enabled DEBUG logging level')
+        if self.args.log_level:
+            logging.getLogger().setLevel(logging.getLevelName(self.args.log_level))
+            logging.debug('Enabled {} logging level'.format(self.args.log_level))
 
         if self.args.import_ipynb:
             check_isfile(self.args.import_ipynb)
@@ -566,6 +568,7 @@ class Notebook:
             fatal('--export-pynb requires --no-exec')
 
         self.process(uid=uid,
+                     add_footer=not self.args.disable_footer,
                      no_exec=self.args.no_exec,
                      disable_cache=self.args.disable_cache,
                      ignore_cache=self.args.ignore_cache)

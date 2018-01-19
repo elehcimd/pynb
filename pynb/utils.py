@@ -44,3 +44,8 @@ def fatal(msg):
 def check_isfile(pathname):
     if not os.path.isfile(pathname):
         fatal("File '{}' does not exist or not regular file".format(pathname))
+
+
+def print_console(m):
+    with open('/dev/stdout', 'w') as f:
+        f.write('{}\n'.format(m))

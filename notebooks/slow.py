@@ -5,10 +5,9 @@ def cells():
 
     import time
 
-
     def query_db():
         time.sleep(5)
-        return [1,2,3,4,5]
+        return [1, 2, 3, 4, 5]
 
     def clean(data):
         time.sleep(2)
@@ -26,7 +25,7 @@ def cells():
     '''
     '''
 
-    data = myfilter(rows)
+    data = clean(rows)
 
     '''
     '''

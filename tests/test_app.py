@@ -66,6 +66,6 @@ def test_export_pynb(tmpdir):
 
 def test_no_double_footer(tmpdir):
     test_pynb_export_ipynb(tmpdir)
-    cmd = 'pynb --disable-cache --import-ipynb {}/test.ipynb --export-ipynb - --debug'
+    cmd = 'pynb --disable-cache --import-ipynb {}/test.ipynb --export-ipynb - --log-level DEBUG'
     output = local(cmd.format(tmpdir), capture=True)
     assert 'Footer cell already present' in output.stderr

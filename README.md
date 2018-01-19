@@ -57,6 +57,10 @@ To run the `sum.py:cells` notebook reported above:
 pynb notebooks/sum.py --param a=3 --param b=5
 ```
 
+You can set a different logging level with the `--log-level` option. The default logging level is INFO.
+
+By default, a Markdown cell is appended if exporting to Jupyter notebook format with details on the execution: location of Python notebook, execution time and complete command line. You can avoid the insertion of the footer cell with the `--disable-footer` option.
+
 The default name of the function defining the notebook is `cells`. A different function name can be specified by appending `:func_name` to the module pathname. E.g., `sum.py:func_name`. `sum.py:cells` is therefore equivalent to `sum.py`. A Python module can contain multiple notebook definitions by using different function names.
 
 ### Notebook parameters
@@ -92,7 +96,7 @@ The iPython session is dumped using the [dill](https://github.com/uqfoundation/d
 
 How to fix serialization failures:
 
-* First, enable the `--debug` option to print the stack trace of the serialization error (multi-line and coloured). The stack trace will provide hints on which variables are causing the problem.
+* First, enable the DEBUG logging with `--log-level DEBUG` to print the stack trace of the serialization error (multi-line and coloured). The stack trace will provide hints on which variables are causing the problem.
 
 * Second, fix the code:
 
