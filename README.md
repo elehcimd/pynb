@@ -277,7 +277,7 @@ To open a shell in the Docker container:
 fab docker_sh
 ```
 
-### Contributing
+## Contributing
 
 1. Fork it
 2. Create your feature branch: `git checkout -b my-new-feature`
