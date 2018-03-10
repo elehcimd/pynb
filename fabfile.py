@@ -1,10 +1,16 @@
 import importlib
 import os
-
+import sys
+import time
 from fabric.api import local
 from fabric.decorators import task
-import time
+
 import version
+
+
+def fatal(msg):
+    print("Fatal error: {}; exiting.".format(msg))
+    sys.exit(1)
 
 
 def docker_exec(cmdline):
@@ -18,7 +24,9 @@ def docker_exec(cmdline):
 def inc_version():
     """
     Increment micro release version (in 'major.minor.micro') in version.py and re-import it.
-    Major and minor versions must be incremented manually in  version.py.
+    Major and minor versions must be incremented manually in version.py.
+
+    :return: list with current version numbers, e.g., [0,1,23].
     """
 
     new_version = version.__version__
@@ -34,6 +42,49 @@ def inc_version():
     importlib.reload(version)
 
     print('Current version: {}'.format(version.__version__))
+
+    return values
+
+
+@task
+def git_check():
+    """
+    Check that all changes , besides versioning files, are committed
+    :return:
+    """
+
+    # check that changes staged for commit are pushed to origin
+    output = local('git diff --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "',
+                   capture=True).strip()
+    if output:
+        fatal('Stage for commit and commit all changes first: {}'.format(output))
+
+    output = local('git diff --cached --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "',
+                   capture=True).strip()
+    if output:
+        fatal('Commit all changes first: {}'.format(output))
+
+
+def git_push():
+    """
+    Push new version and corresponding tag to origin
+    :return:
+    """
+
+    # get current version
+    new_version = version.__version__
+    values = list(map(lambda x: int(x), new_version.split('.')))
+
+    # Push to origin new version and corresponding tag:
+    # * commit new version
+    # * create tag
+    # * push version,tag to origin
+    local('git add pynb/version.py version.py')
+
+    local('git commit -m "updated version"')
+    local('git tag {}.{}.{}'.format(values[0], values[1], values[2]))
+    local('git push origin --tags')
+    local('git push')
 
 
 @task
@@ -151,14 +202,24 @@ def release():
 
     from secrets import pypi_auth
 
-    inc_version()
+    # Check that all changes are committed before creating a new version
+    git_check()
+
+    # Test package
     test()
+
+    # Increment version
+    inc_version()
+
+    # Commit new version, create tag for version and push everything to origin
+    git_push()
+
+    # Build and publish package
     build()
-
     pathname = 'dist/pynb-{}.tar.gz'.format(version.__version__)
-
     docker_exec('twine upload -u {user} -p {pass} {pathname}'.format(pathname=pathname, **pypi_auth))
 
+    # Remove temporary files
     clean()
 
 

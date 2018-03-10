@@ -10,3 +10,4 @@ secrets.py
 .ipynb_checkpoints
 *.ipynb
 .pytest_cache
+local
