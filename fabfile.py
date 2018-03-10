@@ -53,15 +53,14 @@ def git_push():
     :return:
     """
 
-    # check that changes staged for commit are pushed to origin
-    output = local('git diff --cached --name-only', capture=True).strip()
-    if output != "":
-        fatal("'git diff --cached --name-only' should be empty. Commit all your changes first")
+    # version.py ignored since it's in .gitignore, and it's then added explicitly.
 
-    # check that repository completely sync to origin, besides versioning and tag
-    output = local('git diff --cached --name-only', capture=True).strip()
-    if output != 'pynb/version.py\nversion.py':
-        fatal("'git diff --name-only' should list only versioning files. Commit all changes first")
+    # check that changes staged for commit are pushed to origin
+    if local('git diff --name-only', capture=True).strip() != "":
+        fatal('Stage for commit and commit all changes first')
+
+    if local('git diff --cached --name-only', capture=True).strip() != "":
+        fatal('Commit all changes first')
 
     # get current version
     new_version = version.__version__
