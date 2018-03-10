@@ -9,3 +9,4 @@ __pycache__
 secrets.py
 .ipynb_checkpoints
 *.ipynb
+.pytest_cache

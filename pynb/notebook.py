@@ -1,16 +1,15 @@
 import argparse
 import datetime
+import dill
 import hashlib
 import inspect
 import logging
+import nbformat as nbf
 import os
 import sys
 import time
 import traceback
 import warnings
-
-import dill
-import nbformat as nbf
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.preprocessors.execute import CellExecutionError
@@ -402,31 +401,35 @@ class Notebook:
 
         logging.info("HTML notebook exported to '{}'".format(pathname))
 
-    def export_pynb(self, pathname):
+    def export_pynb_str(self):
 
-        if pathname == '-':
-            f = sys.__stdout__
-        else:
-            f = open(pathname, 'w')
-
-        f.write('def cells():\n')
+        s = 'def cells():\n'
 
         for cell in self.nb['cells']:
             if cell.cell_type == 'markdown':
-                f.write("    '''\n")
+                s += "    '''\n"
                 for line in cell.source.splitlines():
-                    f.write('    {}\n'.format(line))
-                f.write("    '''\n")
+                    s += '    {}\n'.format(line)
+                s += "    '''\n"
             elif cell.cell_type == 'code':
                 for line in cell.source.splitlines():
-                    f.write('    {}\n'.format(line))
+                    s += '    {}\n'.format(line)
             else:
                 raise Exception('Unknown cell type: {}'.format(cell.cell_type))
 
-            f.write("\n    '''\n    '''\n\n")
+            s += "\n    '''\n    '''\n\n"
 
-        if f is not sys.__stdout__:
-            f.close()
+        return s
+
+    def export_pynb(self, pathname):
+
+        s = self.export_pynb_str()
+
+        if pathname == '-':
+            sys.__stdout__.write(s)
+        else:
+            with open(pathname, 'w') as f:
+                f.write(s)
 
         logging.info("Python notebook exported to '{}'".format(pathname))
 
@@ -459,9 +462,8 @@ class Notebook:
 
         try:
             self.cells = get_func(func_name, pathname)
-        except Exception as e:
-            logging.error(traceback.format_exc())
-            fatal("Function '{}' not found in '{}': {}".format(func_name, pathname, e))
+        except SyntaxError as e:
+            fatal(traceback.format_exc(limit=1))
 
         return pathname, func_name
 
@@ -482,6 +484,7 @@ class Notebook:
         self.add_argument('--export-ipynb', help='export to Jupyter notebook')
         self.add_argument('--export-pynb', help='export to Python notebook')
         self.add_argument('--log-level', help='set log level')
+        self.add_argument('--check-syntax', action="store_true", default=False, help='check Python syntax')
         self.add_argument('--disable-footer', action="store_true", default=False,
                           help='do not append Markdown footer to Jupyter notebook')
 
