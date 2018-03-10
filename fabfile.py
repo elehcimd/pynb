@@ -21,7 +21,6 @@ def docker_exec(cmdline):
     local('docker exec -ti pynb {}'.format(cmdline))
 
 
-@task
 def inc_version():
     """
     Increment micro release version (in 'major.minor.micro') in version.py and re-import it.
@@ -55,23 +54,22 @@ def git_check():
     """
 
     # check that changes staged for commit are pushed to origin
-    output = local('git diff --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "', capture=True).strip()
+    output = local('git diff --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "',
+                   capture=True).strip()
     if output:
         fatal('Stage for commit and commit all changes first: {}'.format(output))
 
-    output = local('git diff --cached --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "', capture=True).strip()
+    output = local('git diff --cached --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "',
+                   capture=True).strip()
     if output:
         fatal('Commit all changes first: {}'.format(output))
 
 
-
-@task
 def git_push():
     """
     Push new version and corresponding tag to origin
     :return:
     """
-
 
     # get current version
     new_version = version.__version__
@@ -206,11 +204,11 @@ def release():
     # Check that all changes are committed before creating a new version
     git_check()
 
-    # Increment version
-    inc_version()
-
     # Test package
     test()
+
+    # Increment version
+    inc_version()
 
     # Commit new version, create tag for version and push everything to origin
     git_push()
