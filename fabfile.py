@@ -62,6 +62,7 @@ def git_push():
     if local('git diff --cached --name-only', capture=True).strip() != "":
         fatal('Commit all changes first')
 
+    return
     # get current version
     new_version = version.__version__
     values = list(map(lambda x: int(x), new_version.split('.')))
