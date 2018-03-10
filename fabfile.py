@@ -57,10 +57,10 @@ def git_push():
     # version.py ignored since it's in .gitignore, and it's then added explicitly.
 
     # check that changes staged for commit are pushed to origin
-    if local('git diff --name-only | egrep -v "^(pynb/version.py)|(version.py)$"', capture=True).strip() != "":
+    if local('git diff --name-only 2>&1 | egrep -v "^(pynb/version.py)|(version.py)$" | true', capture=True).strip() != "":
         fatal('Stage for commit and commit all changes first')
 
-    if local('git diff --cached --name-only | egrep -v "^(pynb/version.py)|(version.py)$"', capture=True).strip() != "":
+    if local('git diff --cached --name-only 2>&1 | egrep -v "^(pynb/version.py)|(version.py)$" | true', capture=True).strip() != "":
         fatal('Commit all changes first')
 
     # get current version
