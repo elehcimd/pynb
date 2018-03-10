@@ -48,20 +48,30 @@ def inc_version():
 
 
 @task
+def git_check():
+    """
+    Check that all changes , besides versioning files, are committed
+    :return:
+    """
+
+    # check that changes staged for commit are pushed to origin
+    output = local('git diff --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "', capture=True).strip()
+    if output:
+        fatal('Stage for commit and commit all changes first: {}'.format(output))
+
+    output = local('git diff --cached --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "', capture=True).strip()
+    if output:
+        fatal('Commit all changes first: {}'.format(output))
+
+
+
+@task
 def git_push():
     """
     Push new version and corresponding tag to origin
     :return:
     """
 
-    # version.py ignored since it's in .gitignore, and it's then added explicitly.
-
-    # check that changes staged for commit are pushed to origin
-    if local('git diff --name-only 2>&1 | egrep -v "^(pynb/version.py)|(version.py)$" | true', capture=True).strip() != "":
-        fatal('Stage for commit and commit all changes first')
-
-    if local('git diff --cached --name-only 2>&1 | egrep -v "^(pynb/version.py)|(version.py)$" | true', capture=True).strip() != "":
-        fatal('Commit all changes first')
 
     # get current version
     new_version = version.__version__
@@ -73,9 +83,9 @@ def git_push():
     # * push version,tag to origin
     local('git add pynb/version.py version.py')
 
-    local('git commit -m "updated version"')
-    local('git tag {}.{}.{}'.format(values[0], values[1], values[2]))
-    local('git push origin --tags')
+    #local('git commit -m "updated version"')
+    #local('git tag {}.{}.{}'.format(values[0], values[1], values[2]))
+    #local('git push origin --tags')
 
 
 @task
@@ -193,19 +203,22 @@ def release():
 
     from secrets import pypi_auth
 
+    # Check that all changes are committed before creating a new version
+    git_check()
+
     # Increment version
     inc_version()
 
-    # Test and build package
+    # Test package
     test()
-    build()
 
-    # Push new version to origin
-    ()
+    # Push this version to origin
+    git_push()
 
-    # Publish package
-    pathname = 'dist/pynb-{}.tar.gz'.format(version.__version__)
-    docker_exec('twine upload -u {user} -p {pass} {pathname}'.format(pathname=pathname, **pypi_auth))
+    # Build and publish package
+    #build()
+    #pathname = 'dist/pynb-{}.tar.gz'.format(version.__version__)
+    #docker_exec('twine upload -u {user} -p {pass} {pathname}'.format(pathname=pathname, **pypi_auth))
 
     # Remove temporary files
     clean()
