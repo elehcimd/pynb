@@ -84,6 +84,7 @@ def git_push():
     local('git commit -m "updated version"')
     local('git tag {}.{}.{}'.format(values[0], values[1], values[2]))
     local('git push origin --tags')
+    local('git push')
 
 
 @task
