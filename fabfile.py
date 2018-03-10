@@ -83,9 +83,9 @@ def git_push():
     # * push version,tag to origin
     local('git add pynb/version.py version.py')
 
-    #local('git commit -m "updated version"')
-    #local('git tag {}.{}.{}'.format(values[0], values[1], values[2]))
-    #local('git push origin --tags')
+    local('git commit -m "updated version"')
+    local('git tag {}.{}.{}'.format(values[0], values[1], values[2]))
+    local('git push origin --tags')
 
 
 @task
@@ -212,13 +212,13 @@ def release():
     # Test package
     test()
 
-    # Push this version to origin
+    # Commit new version, create tag for version and push everything to origin
     git_push()
 
     # Build and publish package
-    #build()
-    #pathname = 'dist/pynb-{}.tar.gz'.format(version.__version__)
-    #docker_exec('twine upload -u {user} -p {pass} {pathname}'.format(pathname=pathname, **pypi_auth))
+    build()
+    pathname = 'dist/pynb-{}.tar.gz'.format(version.__version__)
+    docker_exec('twine upload -u {user} -p {pass} {pathname}'.format(pathname=pathname, **pypi_auth))
 
     # Remove temporary files
     clean()
