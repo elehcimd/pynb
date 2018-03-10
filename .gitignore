@@ -11,4 +11,3 @@ secrets.py
 *.ipynb
 .pytest_cache
 local
-version.py

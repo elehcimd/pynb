@@ -21,6 +21,7 @@ def docker_exec(cmdline):
     local('docker exec -ti pynb {}'.format(cmdline))
 
 
+@task
 def inc_version():
     """
     Increment micro release version (in 'major.minor.micro') in version.py and re-import it.
@@ -56,13 +57,12 @@ def git_push():
     # version.py ignored since it's in .gitignore, and it's then added explicitly.
 
     # check that changes staged for commit are pushed to origin
-    if local('git diff --name-only', capture=True).strip() != "":
+    if local('git diff --name-only | egrep -v "^(pynb/version.py)|(version.py)$"', capture=True).strip() != "":
         fatal('Stage for commit and commit all changes first')
 
-    if local('git diff --cached --name-only', capture=True).strip() != "":
+    if local('git diff --cached --name-only | egrep -v "^(pynb/version.py)|(version.py)$"', capture=True).strip() != "":
         fatal('Commit all changes first')
 
-    return
     # get current version
     new_version = version.__version__
     values = list(map(lambda x: int(x), new_version.split('.')))
@@ -72,6 +72,7 @@ def git_push():
     # * create tag
     # * push version,tag to origin
     local('git add pynb/version.py version.py')
+
     local('git commit -m "updated version"')
     local('git tag {}.{}.{}'.format(values[0], values[1], values[2]))
     local('git push origin --tags')
