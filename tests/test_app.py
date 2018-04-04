@@ -3,6 +3,16 @@ import os
 from fabric.api import local
 
 
+def cells_default_params(a=100, b=200):
+    a, b = int(a), int(b)
+    int(a + b)
+
+
+def cells_default_and_not_mixed_params(alpha, a=100, b=200):
+    a, b, alpha = int(a), int(b), int(alpha)
+    int(a + b) * int(alpha)
+
+
 def cells():
     int(10000 + 2345)
 
@@ -21,6 +31,24 @@ def markdown():
     '''
     # Title
     '''
+
+
+def test_pynb_cells_default_params():
+    cmd = 'pynb {}:cells_default_params --disable-cache --export-ipynb -'
+    output = local(cmd.format(os.path.realpath(__file__)), capture=True)
+    assert '300' in output
+
+
+def test_pynb_cells_default_and_not_mixed_params():
+    cmd = 'pynb {}:cells_default_and_not_mixed_params --param alpha=100  --disable-cache --export-ipynb -'
+    output = local(cmd.format(os.path.realpath(__file__)), capture=True)
+    assert '30000' in output
+
+
+def test_pynb_cells_default_overwrite_parameter():
+    cmd = 'pynb {}:cells_default_and_not_mixed_params --param alpha=100  --param a=200 --disable-cache --export-ipynb -'
+    output = local(cmd.format(os.path.realpath(__file__)), capture=True)
+    assert '40000' in output
 
 
 def test_pynb_cells():

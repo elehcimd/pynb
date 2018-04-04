@@ -510,13 +510,22 @@ class Notebook:
             # Let's make sure that this is the case...
             if self.__class__ == Notebook:
                 fatal('Notebook class not extended and cells parameter is missing')
-            logging.info('Loading notebook {}'.format(self.__class__.__name__))
+            logging.info('Loading nopython setup.py developtebook {}'.format(self.__class__.__name__))
             uid = '{}:{}'.format(os.path.abspath(inspect.getfile(self.__class__)), self.__class__.__name__)
 
         # Process parameters passed by custom arguments
-        func_params = set(inspect.getargspec(self.cells).args)
+        arg_spec = inspect.getargspec(self.cells)
+        func_params = arg_spec.args
+        # Get default parameters
+        default_params = arg_spec.defaults
 
         self.kwargs = {}
+
+        if default_params:
+            default_args_with_value = dict(zip(func_params[-len(default_params):], default_params))
+            logging.debug('Found default values {}'.format(default_args_with_value))
+            # Add default values to kwargs
+            self.kwargs.update(default_args_with_value)
 
         if not self.args.cells:
             # self is always present in case of subclassed Notebook, since cells(self, ...) is a method.
