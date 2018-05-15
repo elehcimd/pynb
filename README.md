@@ -83,6 +83,11 @@ pynb --import-ipynb src.ipynb --export-pynb dst.py --no-exec
 The options `--export-html` and `--export-ipynb` let you export to `.html` and `.ipynb` file formats, respectively.
 The special output pathname `-` points to standard output.
 If you only want to convert the notebook without executing it, you can skip its execution using the `--no-exec` option.
+If you export to a Jupyter notebook, you can set the kernel with the `--kernel` option:
+
+  ```
+  pynb notebooks/simple.py --disable-cache --kernel python3 --export-ipynb simple.ipynb
+  ``` 
 
 ### Execution cache
 
