@@ -26,7 +26,7 @@ A `pynb` notebook is a Python function that represents a sequence of cells whose
 # Contents of sum.py
 
 
-def cells(a, b):
+def cells(a, b=3):
     '''
     # Sum
     '''
@@ -66,6 +66,8 @@ The default name of the function defining the notebook is `cells`. A different f
 ### Notebook parameters
 
 Parameters are passed from the command line with `--param` options, whose value is formatted as `name=value`. Names are separated from values at the first occurrence of character `=`. Values are strings and might require casting to their proper type inside the notebook.
+
+Remark that pynb support also default parameter definitions, as it can be seen with `b` in the example. Those default parameters can be overwritten using the standard `--param` notation.
 
 
 ### Importing from Jupyter notebooks 
@@ -265,7 +267,7 @@ To start the daemonized Docker container:
 fab docker_start
 ```
 
-Top stop the Docker container:
+To stop the Docker container:
 
 ```
 fab docker_stop
