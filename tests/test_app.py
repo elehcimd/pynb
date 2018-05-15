@@ -97,3 +97,12 @@ def test_no_double_footer(tmpdir):
     cmd = 'pynb --disable-cache --import-ipynb {}/test.ipynb --export-ipynb - --log-level DEBUG'
     output = local(cmd.format(tmpdir), capture=True)
     assert 'Footer cell already present' in output.stderr
+
+
+def test_pynb_set_kernel(tmpdir):
+    cmd = 'pynb {} --disable-cache --kernel python3 --export-ipynb {}/test.ipynb'
+    local(cmd.format(os.path.realpath(__file__), tmpdir))
+
+    cmd = 'jupyter nbconvert --stdout --to notebook {}/test.ipynb'
+    output = local(cmd.format(tmpdir), capture=True)
+    assert 'python3' in output

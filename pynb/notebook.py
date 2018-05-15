@@ -10,6 +10,7 @@ import sys
 import time
 import traceback
 import warnings
+from jupyter_client.kernelspec import KernelSpecManager
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.preprocessors.execute import CellExecutionError
@@ -483,6 +484,7 @@ class Notebook:
         self.add_argument('--export-html', help='export to HTML format')
         self.add_argument('--export-ipynb', help='export to Jupyter notebook')
         self.add_argument('--export-pynb', help='export to Python notebook')
+        self.add_argument('--kernel', default=None, help='set kernel')
         self.add_argument('--log-level', help='set log level')
         self.add_argument('--check-syntax', action="store_true", default=False, help='check Python syntax')
         self.add_argument('--disable-footer', action="store_true", default=False,
@@ -550,6 +552,24 @@ class Notebook:
 
         return uid
 
+    def get_kernelspec(self, name):
+        """Get a kernel specification dictionary given a kernel name
+        """
+        ksm = KernelSpecManager()
+        kernelspec = ksm.get_kernel_spec(name).to_dict()
+        kernelspec['name'] = name
+        kernelspec.pop('argv')
+        return kernelspec
+
+    def set_kernel(self, name):
+
+        kernelspec = self.get_kernelspec(name)
+
+        metadata = {'language': 'python',
+                    'kernelspec': kernelspec}
+
+        self.nb.update(metadata=metadata)
+
     def run(self):
         """
         Run notebook as an application
@@ -578,6 +598,9 @@ class Notebook:
 
         if self.args.export_pynb and not self.args.no_exec:
             fatal('--export-pynb requires --no-exec')
+
+        if self.args.kernel:
+            self.set_kernel(self.args.kernel)
 
         self.process(uid=uid,
                      add_footer=not self.args.disable_footer,
