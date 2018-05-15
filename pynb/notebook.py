@@ -512,7 +512,7 @@ class Notebook:
             # Let's make sure that this is the case...
             if self.__class__ == Notebook:
                 fatal('Notebook class not extended and cells parameter is missing')
-            logging.info('Loading nopython setup.py developtebook {}'.format(self.__class__.__name__))
+            logging.info('Loading notebook {}'.format(self.__class__.__name__))
             uid = '{}:{}'.format(os.path.abspath(inspect.getfile(self.__class__)), self.__class__.__name__)
 
         # Process parameters passed by custom arguments
