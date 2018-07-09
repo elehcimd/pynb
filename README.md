@@ -46,7 +46,7 @@ Function parameters are mapped to notebook arguments and are injected as an addi
 
 The Python statement `return` has a special meaning and it instructs the parser to ignore the remaining content of the notebook.
 
-A Python module can contain several functions defining multiple noetbooks. Examples can be found [notebooks](https://github.com/minodes/pynb/tree/master/notebooks) directory.
+A Python module can contain several functions defining multiple notebooks. Examples can be found [notebooks](https://github.com/minodes/pynb/tree/master/notebooks) directory.
 
 ## Usage
 
