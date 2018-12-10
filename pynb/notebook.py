@@ -10,6 +10,7 @@ import sys
 import time
 import traceback
 import warnings
+import codecs
 from jupyter_client.kernelspec import KernelSpecManager
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
@@ -313,7 +314,8 @@ class Notebook:
 
         logging.debug("add_cell_markdown: {}".format(cell_str))
         # drop spaces and taps at beginning and end of all lines
-        cell = '\n'.join(map(lambda x: x.strip(), cell_str.split('\n')))
+        #cell = '\n'.join(map(lambda x: x.strip(), cell_str.split('\n')))
+        cell = '\n'.join(cell_str.split('\n'))
         cell = nbf.v4.new_markdown_cell(cell)
 
         self.nb['cells'].append(cell)
@@ -378,8 +380,9 @@ class Notebook:
         if pathname == '-':
             nbf.write(self.nb, sys.__stdout__)
         else:
-            with open(pathname, 'w') as f:
-                nbf.write(self.nb, f)
+            with codecs.open(pathname, 'w', encoding='utf-8') as f:
+                ret = nbf.write(self.nb, f)
+                pass
 
         logging.info("Jupyter notebook exported to '{}'".format(pathname))
 
