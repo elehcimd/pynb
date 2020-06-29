@@ -22,7 +22,7 @@ def main():
 
 
 def test_custom_nbapp():
-    cmd = 'python3 {} --N 10000 --disable-cache'
+    cmd = 'python {} --N 10000 --disable-cache'
     output = local(cmd.format(os.path.realpath(__file__)))
     assert b'50005000' in output
 

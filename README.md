@@ -178,8 +178,7 @@ pip install pynb --upgrade --no-cache
 
 ### Create Python environment
 
-Create a Python virtual environment with the packages in `requirements.txt`.
-Instructions for MacOS:
+Instructions that work on MacOS Catalina:
 
 * Install a specific version of Python: `pyenv install 3.8.3`
 * Create virtualenv: `pyenv virtualenv 3.8.3 pynb`
@@ -189,9 +188,7 @@ Instructions for MacOS:
 * Install package in development mode: `pip install -e .`
 * Remove virtualenv: `pyenv virtualenv-delete nb2md`
 
-In case you need to install `pyenv` with zsh, these are the steps for MacOS:
-
-First:
+Install pyenv/virtualenv:
 
 ```
 brew update
@@ -199,7 +196,7 @@ brew install pyenv
 brew install pyenv-virtualenv
 ```
 
-Second, add to `~.zshrc`:
+Add to `~.zshrc`:
 
 ```
 if command -v pyenv 1>/dev/null 2>&1; then
@@ -209,6 +206,8 @@ fi
 
 if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 ```
+
+The fabfile assumes you have `zsh` as shell and the `pynb` virtual env. 
 
 ### Jupyter server
 
@@ -234,9 +233,9 @@ fab release
 
 ### Running tests
 
-* To run the tests: `pytest`
-* To run tests printing output and stopping at first error: `pytest -sx`
-* To run the pep8 test: `pytest tests/test_pep8.py`
+* To run the tests: `fab test`
+* To run tests printing output and stopping at first error: `pytest test-sx`
+* To run the pep8 test: `fab test-pep8`
 * To fix some common pep8 errors in the code: `fab fix-pep8`
 
 ## Contributing
