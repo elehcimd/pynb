@@ -1,6 +1,6 @@
 # Environment for running, testing and releasing pynb.
 
-# Start from Alpine + Python 3.6
+# Start from Alpine + Python 3.7
 FROM frolvlad/alpine-python3
 
 # Update package index

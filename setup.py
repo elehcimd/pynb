@@ -9,10 +9,10 @@ setup(
     name='pynb',
     version=__version__,
     author='Michele Dallachiesa',
-    author_email='michele.dallachiesa@minodes.com',
+    author_email='michele.dallachiesa@sigforge.com',
     packages=['pynb'],
     scripts=[],
-    url='https://github.com/minodes/pynb',
+    url='https://github.com/elehcimd/pynb',
     license='MIT',
     description='Manage Jupyter notebooks as Python code with embedded Markdown text.',
     long_description=long_description,
@@ -30,7 +30,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',

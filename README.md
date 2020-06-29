@@ -1,6 +1,6 @@
 # Jupyter Notebooks as Python with embedded Markdown
 
-`pynb` builds on top of [nbconvert](https://github.com/jupyter/nbconvert) and lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling:
+`pynb` relies on [nbconvert](https://github.com/jupyter/nbconvert) and lets you manage Jupyter notebooks as plain Python code with embedded Markdown text, enabling:
 
 * **Python development environment**: Use your preferred IDE/editor, ensure style compliance, navigate, refactor, and test your notebooks as regular Python code.
 
@@ -162,8 +162,6 @@ All command line options available from the `pynb` command line tool are also av
 
 ## Credits and license
 
-[Minodes](http://www.minodes.com) supports this and other Open Source projects.
-
 The pynb project is released under the MIT license. Please see [LICENSE.txt](https://github.com/minodes/pynb/blob/master/LICENSE.txt).
 
 ## Known issues
@@ -176,21 +174,41 @@ In case of errors, try to update the involved packages:
 pip install pynb --upgrade --no-cache
 ```
 
-
 ## Development
 
-Tests, builds and releases are managed with `Fabric`.
-The build, test and release environment is managed with `Docker`.
-Install Docker and Fabric in your system. To install Fabric:
+### Create Python environment
+
+Create a Python virtual environment with the packages in `requirements.txt`.
+Instructions for MacOS:
+
+* Install a specific version of Python: `pyenv install 3.8.3`
+* Create virtualenv: `pyenv virtualenv 3.8.3 pynb`
+* Activate virtualenv: `pyenv activate pynb`
+* Update pip: `pip install --upgrade pip`
+* Install packages: `pip install -r requirements.txt`
+* Install package in development mode: `pip install -e .`
+* Remove virtualenv: `pyenv virtualenv-delete nb2md`
+
+In case you need to install `pyenv` with zsh, these are the steps for MacOS:
+
+First:
 
 ```
-pip install Fabric3
+brew update
+brew install pyenv
+brew install pyenv-virtualenv
 ```
 
-### Dependencies
+Second, add to `~.zshrc`:
 
-For ease of development, the file `requirements.txt` includes the package dependencies.
-Any changes to the package dependencies in `setup.py` must be reflected in `requirements.txt`.
+```
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+  export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+fi
+
+if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+```
 
 ### Jupyter server
 
@@ -214,75 +232,12 @@ To release a new version:
 fab release
 ```
 
+### Running tests
 
-### Running the tests
-
-To run the py.test tests:
-
-```
-fab test
-```
-
-To run a single test:
-
-```
-fab test:tests/test_class.py::test_custom_nbapp
-```
-
-To run tests printing output and stopping at first error:
-
-```
-fab test_sx
-```
-
-To run the pep8 test:
-
-```
-fab test_pep8
-```
-
-To fix some common pep8 errors in the code:
-
-```
-fab fix_pep8
-```
-
-To test the pip package after a new release (end-to-end test):
-```
-fab test_pip
-```
-
-### Docker container
-
-To build the Docker image:
-
-```
-fab docker_build
-```
-
-To force a complete rebuild of the Docker image without using the cache:
-
-```
-fab docker_build:--no-cache
-```
-
-To start the daemonized Docker container:
-
-```
-fab docker_start
-```
-
-To stop the Docker container:
-
-```
-fab docker_stop
-```
-
-To open a shell in the Docker container:
-
-```
-fab docker_sh
-```
+* To run the tests: `pytest`
+* To run tests printing output and stopping at first error: `pytest -sx`
+* To run the pep8 test: `pytest tests/test_pep8.py`
+* To fix some common pep8 errors in the code: `fab fix-pep8`
 
 ## Contributing
 

@@ -1,16 +1,17 @@
 import argparse
+import codecs
 import datetime
-import dill
 import hashlib
 import inspect
 import logging
-import nbformat as nbf
 import os
 import sys
 import time
 import traceback
 import warnings
-import codecs
+
+import dill
+import nbformat as nbf
 from jupyter_client.kernelspec import KernelSpecManager
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
@@ -51,11 +52,12 @@ class CachedExecutePreprocessor(ExecutePreprocessor):
         hash = hashlib.sha1(s).hexdigest()[:8]
         return hash
 
-    def run_cell(self, cell, cell_index=0):
+    def run_cell(self, cell, cell_index=0, store_history=True):
         """
         Run cell with caching
         :param cell: cell to run
         :param cell_index: cell index (optional)
+        :param store_history: ignored but required because expected from Jupyter executor (optional)
         :return:
         """
 
@@ -314,7 +316,7 @@ class Notebook:
 
         logging.debug("add_cell_markdown: {}".format(cell_str))
         # drop spaces and taps at beginning and end of all lines
-        #cell = '\n'.join(map(lambda x: x.strip(), cell_str.split('\n')))
+        # cell = '\n'.join(map(lambda x: x.strip(), cell_str.split('\n')))
         cell = '\n'.join(cell_str.split('\n'))
         cell = nbf.v4.new_markdown_cell(cell)
 

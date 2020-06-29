@@ -1,24 +1,87 @@
 import importlib
 import os
 import sys
-import time
-from fabric.api import local
-from fabric.decorators import task
+
+from fabric import task
 
 import version
 
+# this must be before importing from secrets.
+sys.path = ["."] + sys.path
 
-def fatal(msg):
-    print("Fatal error: {}; exiting.".format(msg))
-    sys.exit(1)
+from secrets import pypi_auth
 
 
-def docker_exec(cmdline):
+# Initialise project directory and name
+project_dir = os.path.abspath(os.path.dirname(__file__))
+project_name = os.path.basename(project_dir)
+
+# Change directory to directory containing this script
+os.chdir(project_dir)
+
+
+def local(ctx, *args, **kwargs):
+    s = "Executing: {} {}".format(args, kwargs)
+    if len(s) > 70:
+        s = s[:70] + f".. ({len(s[70:])})"
+    print(s)
+
+    with ctx.prefix("PATH={}".format(os.environ["PATH"])):
+        return ctx.run(*args, **kwargs)
+
+
+@task
+def test_pep8(ctx):
     """
-    Execute command in running docker container
-    :param cmdline: command to be executed
+    Run only pep8 test
+    :return:
     """
-    local('docker exec -ti pynb {}'.format(cmdline))
+
+    local(ctx, 'py.test tests/test_pep8.py')
+
+
+@task
+def test(ctx):
+    """
+    Run all tests
+    :param params: parameters to py.test
+    :return:
+    """
+
+    local(ctx, f'py.test tests')
+
+
+@task
+def test_sx(ctx):
+    """
+    Run all tests
+    :param params: parameters to py.test
+    :return:
+    """
+
+    local(ctx, f'py.test -sx tests')
+
+
+@task
+def test_single(ctx, f):
+    """
+    Run all tests
+    :param params: parameters to py.test
+    :return:
+    """
+
+    local(ctx, f'py.test -sx {f}')
+
+
+@task
+def fix_pep8(ctx):
+    """
+    Fix a few common and easy-to-fix PEP8 mistakes
+    :return:
+    """
+
+    local(ctx,
+          'autopep8 --select E265,E225,E302,E222,E251,E303,W293,W291,W391 --aggressive --in-place --recursive .')
 
 
 def inc_version():
@@ -34,38 +97,47 @@ def inc_version():
     values = list(map(lambda x: int(x), new_version.split('.')))
     values[2] += 1
 
-    with open('version.py', 'w') as f:
-        f.write('__version__ = "{}.{}.{}"\n'.format(values[0], values[1], values[2]))
-    with open('pynb/version.py', 'w') as f:
-        f.write('__version__ = "{}.{}.{}"\n'.format(values[0], values[1], values[2]))
+    with open("version.py", "w") as f:
+        f.write(f'__version__ = "{values[0]}.{values[1]}.{values[2]}"\n')
+        f.write(f'__pkgname__ = "{project_name}"\n')
+    with open(f"{project_name}/version.py", "w") as f:
+        f.write(f'__version__ = "{values[0]}.{values[1]}.{values[2]}"\n')
+        f.write(f'__pkgname__ = "{project_name}"\n')
 
     importlib.reload(version)
 
-    print('Current version: {}'.format(version.__version__))
+    print(f'Package {version.__pkgname__} current version: {version.__version__}')
 
     return values
 
 
 @task
-def git_check():
+def git_check(ctx):
     """
     Check that all changes , besides versioning files, are committed
     :return:
     """
 
     # check that changes staged for commit are pushed to origin
-    output = local('git diff --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "',
-                   capture=True).strip()
+    output = local(ctx, f'git diff --name-only | egrep -v "^({project_name}/version.py)|(version.py)$" | tr "\\n" " "',
+                   hide=True).stdout.strip()
+
     if output:
         fatal('Stage for commit and commit all changes first: {}'.format(output))
 
-    output = local('git diff --cached --name-only | egrep -v "^(pynb/version.py)|(version.py)$" | tr "\\n" " "',
-                   capture=True).strip()
+    output = local(ctx,
+                   f'git diff --cached --name-only | egrep -v "^({project_name}/version.py)|(version.py)$" | tr "\\n" " "',
+                   hide=True).stdout.strip()
     if output:
         fatal('Commit all changes first: {}'.format(output))
 
 
-def git_push():
+def fatal(msg):
+    print("Fatal error: {}; exiting.".format(msg))
+    sys.exit(1)
+
+
+def git_push(ctx):
     """
     Push new version and corresponding tag to origin
     :return:
@@ -79,153 +151,55 @@ def git_push():
     # * commit new version
     # * create tag
     # * push version,tag to origin
-    local('git add pynb/version.py version.py')
+    local(ctx, f'git add {project_name}/version.py version.py')
 
-    local('git commit -m "updated version"')
-    local('git tag {}.{}.{}'.format(values[0], values[1], values[2]))
-    local('git push origin --tags')
-    local('git push')
-
-
-@task
-def docker_build(options=''):
-    """
-    Build docker image
-    """
-    local('docker build {} -t pynb .'.format(options))
+    local(ctx, 'git commit -m "updated version"')
+    local(ctx, f'git tag {values[0]}.{values[1]}.{values[2]}')
+    local(ctx, 'git push origin --tags')
+    local(ctx, 'git push')
 
 
 @task
-def docker_start(develop=True):
-    """
-    Start docker container
-    """
-    curr_dir = os.path.dirname(os.path.realpath(__file__))
-    local('docker run --rm --name pynb -d -ti -p 127.0.0.1:8889:8888  -v {}:/code -t pynb'.format(curr_dir))
-
-    if develop:
-        # Install package in develop mode: the code in /code is mapped to the installed package.
-        docker_exec('python3 setup.py develop')
-
-    print('Jupyter available at http://127.0.0.1:8889')
-
-
-@task
-def docker_stop():
-    """
-    Stop docker container
-    """
-    local('docker stop pynb || true')
-
-
-@task
-def docker_sh():
-    """
-    Execute command in docker container
-    """
-    docker_exec('/bin/bash')
-
-
-@task
-def test_pip(cleancontainer=True):
-    """
-    Run all tests in docker container
-    :param params: parameters to py.test
-    """
-
-    if cleancontainer:
-        docker_stop()
-        # sometimes, Docker returns too early and then docker_start fails.
-        time.sleep(1)
-        docker_start(develop=False)
-    # WE have now a fresh container as defined in Dockerfile
-
-    docker_exec('pip install pynb')
-    test()
-
-    # restart with develop package install
-    docker_stop()
-    docker_start()
-
-    print("All tests passed!")
-
-
-@task
-def test(params=''):
-    """
-    Run all tests in docker container
-    :param params: parameters to py.test
-    """
-    docker_exec('py.test {}'.format(params))
-
-
-@task
-def test_sx(params=''):
-    """
-    Execute all tests in docker container printing output and terminating tests at first failure
-    :param params: parameters to py.test
-    """
-    docker_exec('py.test -sx {}'.format(params))
-
-
-@task
-def test_pep8():
-    """
-    Execute  only pep8 test in docker container
-    """
-    docker_exec('py.test tests/test_pep8.py')
-
-
-@task
-def fix_pep8():
-    """
-    Fix a few common and easy PEP8 mistakes in docker container
-    """
-    docker_exec('autopep8 --select E251,E303,W293,W291,W391,W292,W391,E302 --aggressive --in-place --recursive .')
-
-
-@task
-def build():
-    """
-    Build package in docker container
-    :return:
-    """
-    docker_exec('python3 setup.py sdist bdist_wheel')
-
-
-@task
-def release():
+def release(ctx):
     """
     Release new package version to pypi
     :return:
     """
 
-    from secrets import pypi_auth
-
     # Check that all changes are committed before creating a new version
-    git_check()
+    git_check(ctx)
 
     # Test package
-    test()
+    test(ctx)
 
     # Increment version
     inc_version()
 
     # Commit new version, create tag for version and push everything to origin
-    git_push()
+    git_push(ctx)
 
     # Build and publish package
-    build()
-    pathname = 'dist/pynb-{}.tar.gz'.format(version.__version__)
-    docker_exec('twine upload -u {user} -p {pass} {pathname}'.format(pathname=pathname, **pypi_auth))
+    pkgbuild(ctx)
+    pathname = f'dist/{project_name}-{version.__version__}.tar.gz'
+
+    local(ctx, f'twine upload -u {pypi_auth["user"]} -p {pypi_auth["pass"]} {pathname}')
 
     # Remove temporary files
-    clean()
+    clean(ctx)
 
 
 @task
-def clean():
+def pkgbuild(ctx):
+    """
+    Build package in docker container
+    :return:
+    """
+    local(ctx, 'python setup.py sdist bdist_wheel')
+
+
+@task
+def clean(ctx):
     """
     Rempove temporary files
     """
-    local('rm -rf .cache .eggs build dist')
+    local(ctx, 'rm -rf .cache .eggs build dist')

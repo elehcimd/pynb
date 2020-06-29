@@ -1,8 +1,12 @@
 import os
 
-from fabric.api import local
-
+import subprocess
 from pynb.notebook import Notebook
+
+
+def local(args):
+    cmd = ' '.join(args) if type(args) == list else args
+    return subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
 
 
 class MyTestNotebook(Notebook):
@@ -19,8 +23,8 @@ def main():
 
 def test_custom_nbapp():
     cmd = 'python3 {} --N 10000 --disable-cache'
-    output = local(cmd.format(os.path.realpath(__file__)), capture=True)
-    assert '50005000' in output
+    output = local(cmd.format(os.path.realpath(__file__)))
+    assert b'50005000' in output
 
 
 #############################################################################
