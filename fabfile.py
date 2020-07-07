@@ -19,11 +19,6 @@ project_name = os.path.basename(project_dir)
 os.chdir(project_dir)
 
 
-@task
-def fuck(ctx):
-    local(ctx, "./runme.sh")
-
-
 def local(ctx, *args, **kwargs):
     s = "Executing: {} {}".format(args, kwargs)
     if len(s) > 70:
